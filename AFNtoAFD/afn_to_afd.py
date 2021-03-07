@@ -4,10 +4,10 @@
 ######################################################
 # afn_to_afd.py
 ######################################################
-# Python3 programa que recibe dos entradas.
-# 1. String: Contendra una expresion regular
-# 2. AFN: Archivo csv con la tabla de transicion de
-#         un AFN.
+# Python3 programa que recibe una entrada.
+# 1. AFN: Archivo csv con la tabla de transicion de
+#         un AFN generada con el algoritmo de 
+#         thompson.
 ######################################################
 
 # imports _________________________
@@ -19,12 +19,6 @@ import sys, getopt
 
 import os
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
-
-
-# Definitions _________________________
-#conjuntos = []  # contendra los estados
-#afn_tran_table = [] #tabla de transisicion del automata finito no determinista
-#afd_tran_table= []
 
 # Functions area______________________________________________
 def transition_afn_table(csvfile='afn-tran-table.csv'):
@@ -39,14 +33,6 @@ def transition_afn_table(csvfile='afn-tran-table.csv'):
     my_file = os.path.join(THIS_FOLDER, csvfile)
     df = pd.read_csv(my_file,sep=";")
     df_header = pd.read_csv(my_file,sep=";",header=None)
-
-    #print(df.to_string()) # table
-        #print(len(df))        #number of rows
-        #print(df.values[0])   #each row
-        #print(df.values[1]) 
-        #print(df.values[2]) 
-        #print(df.values[3]) 
-        #print(df.values[4]) 
 
     transiciones = []
     for col in range(len(df.values[0])):
@@ -128,7 +114,6 @@ def epsilon_closure(move,afnTranTable):
         stateSet.append(move[m])
 
         # epsilon = [['1,7'],['2,4'],...,[s]]
-        
         # Ej. epsilonState = '1,7'
         if(len(epsilonStates[i].split(',')) > 1 and epsilonStates[i] != 'vacio'): 
             epsilonStateSet = epsilonStates[i].split(',') # ['1','7'] (i = 0)
@@ -189,10 +174,10 @@ def epsilon_closure(move,afnTranTable):
                 elif(len(epsilonTransitionState) == 1):
                     stateSet.append(epsilonTransitionState[0])
                 s += 1
-            
+
             # delete duplicate values
             stateSet = list(dict.fromkeys(stateSet))
-            #sort ascendent
+            # sort ascendent
             stateSet.sort(key = int)
 
     return stateSet
@@ -208,51 +193,23 @@ def convertion_from_afn_to_afd(afn_tran_table,alfabeto):
      - alfabeto: el alfabeto de entrada
     '''
 
-    '''m = move()
-    A = epsilon_closure(m,afn_tran_table)
-    print('A = '+str(A))
-
-    m = move(A,0,afn_tran_table)
-    print('move(A,a) = '+str(m))
-    B = epsilon_closure(m,afn_tran_table)
-    print('B = '+str(B))
-
-    m = move(A,1,afn_tran_table)
-    print('move(A,b) = '+str(m))
-    C = epsilon_closure(m,afn_tran_table)
-    print('C = '+str(C))
-
-    m = move(B,0,afn_tran_table)
-    print('move(B,a) = '+str(m))
-    B = epsilon_closure(m,afn_tran_table)
-    print('B = '+str(B))
-
-    m = move(B,1,afn_tran_table)
-    print('move(B,b) = '+str(m))
-    D = epsilon_closure(m,afn_tran_table)
-    print('D = '+str(D))
-
-    m = move(D,1,afn_tran_table)
-    print('move(D,b) = '+str(m))
-    E = epsilon_closure(m,afn_tran_table)
-    print('E = '+str(E))'''
-
     afn_states = []
+    # calculo de epsilon-closure(move(['0']))
     m = move()
     afn_states.append(epsilon_closure(m,afn_tran_table))
     print('A = '+str(epsilon_closure(m,afn_tran_table)))
 
-    #afn_states_len = len(afn_states)
-    #for afnS in range(0,afn_states_len):
     afnS = 0
+    trans_afds = [] #todas las transiciones del afd para cada estado del afn
     while (afnS < len(afn_states)):
         print('len(afn)'+str(afnS))
         print('afn-states: '+str(afn_states))
         appends = 0
+        trans_afd = [] #transiciones del afd de cada set de estados del afn
         for token in range(len(alfabeto)): #0, 1 ~ a, b
             m = move(afn_states[afnS],token,afn_tran_table)
             d_tran = epsilon_closure(m,afn_tran_table)
-
+            trans_afd.append(d_tran)
             # revisamos si el conjunto de estados ya existe en afn_states
             exist = False
             for x in range(len(afn_states)):
@@ -265,6 +222,7 @@ def convertion_from_afn_to_afd(afn_tran_table,alfabeto):
                 if(str(d_tran[len(d_tran)-1]) == str(afn_tran_table[0][len(afn_tran_table[0])-1])): 
                     print('sdfaslkdjfa')
                     afn_states.append(d_tran)
+                    
                     appends += 1
                     #afnS = len(afn_states)
                     #break
@@ -273,9 +231,14 @@ def convertion_from_afn_to_afd(afn_tran_table,alfabeto):
                     print(str(afnS)+' = '+str(d_tran))
                     afn_states.append(d_tran) 
                     appends += 1
+        trans_afds.append(trans_afd)
         afnS += 1
 
+    alfabeto_trans_afd = []
+    print('trans afd: '+ str(trans_afds))
+
     
+
 
     return afn_states
 
