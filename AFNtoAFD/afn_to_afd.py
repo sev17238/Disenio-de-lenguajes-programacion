@@ -201,20 +201,25 @@ def convertion_from_afn_to_afd(afn_tran_table,alfabeto):
 
     afnS = 0
     trans_afds = [] #todas las transiciones del afd para cada estado del afn
+    trans_afd_marks = []
     while (afnS < len(afn_states)):
         print('len(afn)'+str(afnS))
         print('afn-states: '+str(afn_states))
         appends = 0
         trans_afd = [] #transiciones del afd de cada set de estados del afn
+        trans_afd_mark = []
         for token in range(len(alfabeto)): #0, 1 ~ a, b
             m = move(afn_states[afnS],token,afn_tran_table)
             d_tran = epsilon_closure(m,afn_tran_table)
             trans_afd.append(d_tran)
+
             # revisamos si el conjunto de estados ya existe en afn_states
             exist = False
             for x in range(len(afn_states)):
                 if(d_tran == afn_states[x]):
                     exist = True
+                    trans_afd_mark.append(x+1) # +1 debido a que abajo se hace append luego de agregar un elemento lo que hace 1 posicion mas largo el arreglo
+
             # si no existe entonces agregaremos un nuevo set de estados
             if(exist == False):
                 #revisamos si tiene el estado de aceptacion para detener el ciclo
@@ -222,8 +227,9 @@ def convertion_from_afn_to_afd(afn_tran_table,alfabeto):
                 if(str(d_tran[len(d_tran)-1]) == str(afn_tran_table[0][len(afn_tran_table[0])-1])): 
                     print('sdfaslkdjfa')
                     afn_states.append(d_tran)
-                    
                     appends += 1
+                    trans_afd_mark.append(len(afn_states)) #marcas estados de transicion afd
+
                     #afnS = len(afn_states)
                     #break
                 #sino contiene el estado de aceptacion continuar
@@ -231,13 +237,20 @@ def convertion_from_afn_to_afd(afn_tran_table,alfabeto):
                     print(str(afnS)+' = '+str(d_tran))
                     afn_states.append(d_tran) 
                     appends += 1
+                    trans_afd_mark.append(len(afn_states))  #marcas estados de transicion afd
         trans_afds.append(trans_afd)
+        trans_afd_marks.append(trans_afd_mark)
         afnS += 1
 
     alfabeto_trans_afd = []
     print('trans afd: '+ str(trans_afds))
+    print('trans afd marks: '+ str(trans_afd_marks))
 
-    
+
+    #for s in range(len(afn_states)):
+    #    setS = afn_states[s]
+    #    for ss in range(len(trans_afds)):
+
 
 
     return afn_states
