@@ -35,12 +35,11 @@ def transition_afn_table(csvfile='afn-tran-table.csv'):
 
     Params:
      - csvFile: archivo csv con la representacion de un afn cualquiera
-     - return - [[Estados,...],[a,...],[b,...],...,[Epsilon,...]]
+     - return - [[Estados,...],[a,...],[b,...],[c,...]....,[Epsilon,...]]
     '''
     my_file = os.path.join(THIS_FOLDER, csvfile)
     df = pd.read_csv(my_file,sep=";")
-    #df = pd.read_csv(my_file,sep=";",header=None)
-    #df_no_headers = df = pd.read_csv(my_file,sep=";")
+    df_header = pd.read_csv(my_file,sep=";",header=None)
 
     #print(df.to_string()) # table
         #print(len(df))        #number of rows
@@ -49,11 +48,6 @@ def transition_afn_table(csvfile='afn-tran-table.csv'):
         #print(df.values[2]) 
         #print(df.values[3]) 
         #print(df.values[4]) 
-        #
-        #estados = []
-        #for estado in range(len(df)):
-        #    estados.append(df.values[estado][0])
-        #print(str(estados))
 
     transiciones = []
     for col in range(len(df.values[0])):
@@ -62,22 +56,40 @@ def transition_afn_table(csvfile='afn-tran-table.csv'):
             alfabetoTrans.append(df.values[row][col])
         transiciones.append(alfabetoTrans)
 
-    return transiciones
+    alfabeto = []
+    for abc in range(1,len(df_header.values[0])-1):
+        alfabeto.append(df_header.values[0][abc])
 
-def move(conjuntoEstados,transicion,afnTranTable):
+    return transiciones, alfabeto
+
+def move(statesSet=[],transition=None,afnTranTable=[]):
     '''
     Funcion mover() que retorna los estados del conjunto de estados proporcionado, que pasan 
-    por la transicion especificada. Ej. move(A,a)
+    por la transicion especificada. Ej. move(A,a) ~ move(A,0)
 
     Params:
-     - conjuntoEstados: Un conjunto de estados de un AFN Ej. A = {0,1,2,4,7}
-     - transicion: transicion por la que pueden pasar algunos de los estados en A
+     - statesSet: Un conjunto de estados de un AFN Ej. A = {0,1,2,4,7}
+     - transition: transicion por la que pueden pasar algunos de los estados en A. En 
+       este caso sabemos que (a, b, c ~ 0, 1, 2) por lo tanto se ingresa la posicion 
+       del token en el array con el alfabeto.
      - afnTranTable: tabla de transiciones del AFN en question
      - return - [3,8]
     '''
+    if(transition == None):
+        return '0'
+    else:
+        result = []
+        transition_column = afnTranTable[transition+1]
+        for i in range(len(statesSet)):
+            state_of_Set_param = statesSet[i] #0
+            state = transition_column[int(state_of_Set_param)]
+            # Se revisa que el estado no sea nulo
+            if(state != 'vacio' and len(state) >1):
+                result.append(transition_column[int(state_of_Set_param)].split(','))
+            elif(state != 'vacio' and len(state) == 1):
+                result.append(transition_column[int(state_of_Set_param)])
 
-
-    return 0
+        return result
 
 def find_epsilon_transitions_state(epsilonStates,afnStates,state):
     '''
@@ -90,23 +102,16 @@ def find_epsilon_transitions_state(epsilonStates,afnStates,state):
      - return - [2,4]
     '''
     statesThroughEpsilon = []
-    '''for i in range(len(afnStates)):
-        if (afnStates[i] == int(state)):
-            if(epsilonStates[i] != 'vacio'):
-                statesThroughEpsilon = epsilonStates[i].split(',')
-                #print('sheet')
-                return statesThroughEpsilon'''
     state_ = int(state)
     if (afnStates[state_] == state_):
         if(epsilonStates[state_] != 'vacio'):
             statesThroughEpsilon = epsilonStates[state_].split(',')
-            #print('sheet')
             return statesThroughEpsilon
 
     return statesThroughEpsilon
 
 
-def epsilon_closure(move,afnTranTable,start=False):
+def epsilon_closure(move,afnTranTable):
     '''
     Funcion de cerradura epsilon que retorna todos los estados a los que se 
     puede llegar en el AFN a travez de epsilon. 
@@ -118,7 +123,7 @@ def epsilon_closure(move,afnTranTable,start=False):
      - return - Dtran(A,a) = epsilon_closure(move(A,a)) = [1,2,3,4,6,7,8]
     '''
     stateSet = []
-    if (start):
+    if (move[0] == '0'):
         stateSet.append(move[0])
         epsilonStates = afnTranTable[len(afnTranTable)-1] #ultima posicion de afnTranTable = Estados_transicion_epsilon
 
@@ -159,12 +164,7 @@ def epsilon_closure(move,afnTranTable,start=False):
 
             #break
 
-
-
-
     return stateSet
-
-
 
 
 def convertion_from_afn_to_afd():
@@ -176,7 +176,6 @@ def convertion_from_afn_to_afd():
     return 0
 
 
-
 # Main______________________________________________
 def main():
     file=''
@@ -184,12 +183,12 @@ def main():
 
     #file = str(sys.argv[1])
     file = 'afn-tran-table.csv'
-    afn_tran_table = transition_afn_table(file)
+    afn_tran_table, alfabeto = transition_afn_table(file)
     print(file)
-    print(afn_tran_table)
+    print('tabla: '+str(afn_tran_table))
+    print('alfabeto: '+str(alfabeto))
 
-    '''
-
+    '''tests..
     sarray = ''
     arr = sarray.split(',')
     print(arr)
@@ -199,22 +198,15 @@ def main():
     print(lala == lele)
     print(lala == lili)'''
 
-    m = ['0']
-    A = epsilon_closure(m,afn_tran_table,True)
+    m = move()
+    A = epsilon_closure(m,afn_tran_table)
     print('A: '+str(A))
-    #
-    #print(m[0])s
+    m = move(A,0,afn_tran_table)
+    print(m)
 
 
 
-
-
-
-    # print(x.get_string(fields=["Estado"])[0])
-    # print(x)
-
-
-
+#Main ________________________
 if __name__ == "__main__":
     main()
 
