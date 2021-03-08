@@ -68,9 +68,9 @@ def move(statesSet=[],transition=None,afnTranTable=[]):
             state_of_Set_param = statesSet[i] #0
             state = transition_column[int(state_of_Set_param)]
             # Se revisa que el estado no sea nulo
-            if(state != 'vacio' and int(state) == False):
+            if(state != 'vacio' and state.find(',') != -1): #chequeo de 1 o mas estados separados por comas
                 result.append(transition_column[int(state_of_Set_param)].split(','))
-            elif(state != 'vacio' and int(state)):
+            elif(state != 'vacio' and state.find(',') == -1):
                 result.append(transition_column[int(state_of_Set_param)])
 
         return result
