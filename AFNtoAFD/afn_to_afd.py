@@ -194,9 +194,11 @@ def convertion_from_afn_to_afd(afn_tran_table,alfabeto):
 
     afn_states = []
     # calculo de epsilon-closure(move(['0']))
+    estadoInicial = []
     m = move()
     afn_states.append(epsilon_closure(m,afn_tran_table))
     print('00 = '+str(epsilon_closure(m,afn_tran_table)))
+    estadoInicial.append(m[0])
 
     afnS = 0
     trans_afds = [] #todas las transiciones del afd para cada estado del afn
@@ -217,7 +219,7 @@ def convertion_from_afn_to_afd(afn_tran_table,alfabeto):
             for x in range(len(afn_states)):
                 if(d_tran == afn_states[x]):
                     exist = True
-                    trans_afd_mark.append(x+1) # +1 debido a que abajo se hace append luego de agregar un elemento lo que hace 1 posicion mas largo el arreglo
+                    trans_afd_mark.append(str(x+1)) # +1 debido a que abajo se hace append luego de agregar un elemento lo que hace 1 posicion mas largo el arreglo
 
             # si no existe entonces agregaremos un nuevo set de estados
             if(exist == False):
@@ -228,18 +230,17 @@ def convertion_from_afn_to_afd(afn_tran_table,alfabeto):
                     estadoAceptacion.append(str(afn_tran_table[0][len(afn_tran_table[0])-1]))
                     afn_states.append(d_tran)
                     appends += 1
-                    trans_afd_mark.append(len(afn_states)) #marcas estados de transicion afd
+                    trans_afd_mark.append(str(len(afn_states))) #marcas estados de transicion afd
                 #sino contiene el estado de aceptacion continuar
                 else:
                     print(str(afnS)+' = '+str(d_tran))
                     afn_states.append(d_tran) 
                     appends += 1
-                    trans_afd_mark.append(len(afn_states))  #marcas estados de transicion afd
+                    trans_afd_mark.append(str(len(afn_states)))  #marcas estados de transicion afd
         trans_afds.append(trans_afd)
         trans_afd_marks.append(trans_afd_mark)
         afnS += 1
 
-    alfabeto_trans_afd = []
     print('trans afd: '+ str(trans_afds))
     print('trans afd marks: '+ str(trans_afd_marks))
 
@@ -253,21 +254,40 @@ def convertion_from_afn_to_afd(afn_tran_table,alfabeto):
     afd_states.insert(0,'AFD')
     afd_trans_table.append(afd_states)
 
+    alfabet_cols = []
     for token in range(len(alfabeto)):
         alfabet_col = []
         for i in range(len(trans_afd_marks)):
             alfabet_col.append(trans_afd_marks[i][token])
         alfabet_col.insert(0,alfabeto[token])
         afd_trans_table.append(alfabet_col)
+        alfabet_cols.append(alfabet_col)
 
     transAFD = []
+    for i in range(1,len(afd_states)):
+        trans = ''
+        for token in range(len(alfabeto)):
+            afdState = str(afd_states[i])
+            tr = str(alfabet_cols[token][0])
+            alfaState = str(alfabet_cols[token][i])
+            trans = afdState + ', '+ tr + ', ' + alfaState
+            transAFD.append(trans)
+    print('transiciones: '+str(transAFD))
 
     # to text
     my_file = os.path.join(THIS_FOLDER, 'afd_tran_table.txt')
     f = open(my_file, "w")
     f.write(str(afd_trans_table)+'\n')
-    f.write('Alfabeto: '+str(alfabeto)+'\n')
-    f.write('Estado Aceptacion: '+str(estadoAceptacion)+'\n')
+    f.close()
+
+    my_file = os.path.join(THIS_FOLDER, 'afd_transitions.txt')
+    f = open(my_file, "w")
+    afd_states.pop(0)
+    f.write('estados = '+str(afd_states)+'\n')
+    f.write('alfabeto = '+str(alfabeto)+'\n')
+    f.write('inicial = '+str(estadoInicial)+'\n')
+    f.write('aceptacion = '+str(estadoAceptacion)+'\n')
+    f.write('transiciones = '+str(transAFD)+'\n')
     f.close()
 
     return afd_trans_table
