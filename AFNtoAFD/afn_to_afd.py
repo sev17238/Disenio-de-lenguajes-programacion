@@ -11,8 +11,7 @@
 ######################################################
 
 # imports _________________________
-from prettytable import PrettyTable
-from prettytable import from_csv
+import csv
 
 import pandas as pd
 import sys, getopt
@@ -143,9 +142,9 @@ def epsilon_closure(move,afnTranTable):
                     stateSet.append(epsilonTransitionState[0])
                 s += 1
 
-            # delete duplicate values
+            # Eliminacion de duplicados
             stateSet = list(dict.fromkeys(stateSet))
-            #sort ascendent
+            # ordenamiento ascendente
             stateSet.sort(key = int)
 
         #Ej. epsilonState = '1'
@@ -175,9 +174,9 @@ def epsilon_closure(move,afnTranTable):
                     stateSet.append(epsilonTransitionState[0])
                 s += 1
 
-            # delete duplicate values
+            # Eliminacion de duplicados
             stateSet = list(dict.fromkeys(stateSet))
-            # sort ascendent
+            # ordenamiento ascendente
             stateSet.sort(key = int)
 
     return stateSet
@@ -197,17 +196,17 @@ def convertion_from_afn_to_afd(afn_tran_table,alfabeto):
     # calculo de epsilon-closure(move(['0']))
     m = move()
     afn_states.append(epsilon_closure(m,afn_tran_table))
-    print('A = '+str(epsilon_closure(m,afn_tran_table)))
+    print('00 = '+str(epsilon_closure(m,afn_tran_table)))
 
     afnS = 0
     trans_afds = [] #todas las transiciones del afd para cada estado del afn
     trans_afd_marks = []
+    estadoAceptacion = []
     while (afnS < len(afn_states)):
-        print('len(afn)'+str(afnS))
         print('afn-states: '+str(afn_states))
         appends = 0
         trans_afd = [] #transiciones del afd de cada set de estados del afn
-        trans_afd_mark = []
+        trans_afd_mark = [] #marcadores de las transiciones del afd de cada set de estados del afn
         for token in range(len(alfabeto)): #0, 1 ~ a, b
             m = move(afn_states[afnS],token,afn_tran_table)
             d_tran = epsilon_closure(m,afn_tran_table)
@@ -225,13 +224,11 @@ def convertion_from_afn_to_afd(afn_tran_table,alfabeto):
                 #revisamos si tiene el estado de aceptacion para detener el ciclo
                 print('d_tran last: '+str(d_tran[len(d_tran)-1])+' aceptacion: '+str(afn_tran_table[0][len(afn_tran_table[0])-1]))
                 if(str(d_tran[len(d_tran)-1]) == str(afn_tran_table[0][len(afn_tran_table[0])-1])): 
-                    print('sdfaslkdjfa')
+                    print('aceptacion al extremo')
+                    estadoAceptacion.append(str(afn_tran_table[0][len(afn_tran_table[0])-1]))
                     afn_states.append(d_tran)
                     appends += 1
                     trans_afd_mark.append(len(afn_states)) #marcas estados de transicion afd
-
-                    #afnS = len(afn_states)
-                    #break
                 #sino contiene el estado de aceptacion continuar
                 else:
                     print(str(afnS)+' = '+str(d_tran))
@@ -249,14 +246,13 @@ def convertion_from_afn_to_afd(afn_tran_table,alfabeto):
     afd_trans_table = []
     afn_states.insert(0,'AFN')
     afd_trans_table.append(afn_states)
-    
+
     afd_states = []
     for i in range(1,len(afn_states)):
         afd_states.append(str(i))
     afd_states.insert(0,'AFD')
     afd_trans_table.append(afd_states)
 
-    
     for token in range(len(alfabeto)):
         alfabet_col = []
         for i in range(len(trans_afd_marks)):
@@ -264,7 +260,36 @@ def convertion_from_afn_to_afd(afn_tran_table,alfabeto):
         alfabet_col.insert(0,alfabeto[token])
         afd_trans_table.append(alfabet_col)
 
+    transAFD = []
+
+    # to text
+    my_file = os.path.join(THIS_FOLDER, 'afd_tran_table.txt')
+    f = open(my_file, "w")
+    f.write(str(afd_trans_table)+'\n')
+    f.write('Alfabeto: '+str(alfabeto)+'\n')
+    f.write('Estado Aceptacion: '+str(estadoAceptacion)+'\n')
+    f.close()
+
     return afd_trans_table
+
+def to_file(afd_tran_table,txtFile='afd_tran_table.txt'):
+    '''
+    Funcion que convierte el arreglo con la tabla de transiciones en arreglos del afd a un txt
+    '''
+    my_file = os.path.join(THIS_FOLDER, txtFile)
+    f = open(my_file, "w")
+    f.write(str(afd_tran_table))
+    f.close()
+
+    ''' #numero de columnas es variable por alfabeto
+    with open('afd_tran_table.csv', 'w',newline='') as csvfile:
+        filewriter = csv.writer(csvfile, delimiter=';')
+        afnStates = afd_tran_table[0]
+        afdStates = afd_tran_table[1]
+        ss = ''
+        for i in range(len(afnStates)):
+            filewriter.writerow([afnStates[i],afdStates[i]])
+    '''
 
 
 # Main______________________________________________
@@ -284,10 +309,7 @@ def main():
     print(str(afd_tran_table))
 
 
-
 #Main ________________________
 if __name__ == "__main__":
     main()
-
-
-#python afn_to_afd.py afn-tran-table.csv
+    #python afn_to_afd.py afn-tran-table.csv
