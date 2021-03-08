@@ -246,14 +246,25 @@ def convertion_from_afn_to_afd(afn_tran_table,alfabeto):
     print('trans afd: '+ str(trans_afds))
     print('trans afd marks: '+ str(trans_afd_marks))
 
+    afd_trans_table = []
+    afn_states.insert(0,'AFN')
+    afd_trans_table.append(afn_states)
+    
+    afd_states = []
+    for i in range(1,len(afn_states)):
+        afd_states.append(str(i))
+    afd_states.insert(0,'AFD')
+    afd_trans_table.append(afd_states)
 
-    #for s in range(len(afn_states)):
-    #    setS = afn_states[s]
-    #    for ss in range(len(trans_afds)):
+    
+    for token in range(len(alfabeto)):
+        alfabet_col = []
+        for i in range(len(trans_afd_marks)):
+            alfabet_col.append(trans_afd_marks[i][token])
+        alfabet_col.insert(0,alfabeto[token])
+        afd_trans_table.append(alfabet_col)
 
-
-
-    return afn_states
+    return afd_trans_table
 
 
 # Main______________________________________________
@@ -268,18 +279,9 @@ def main():
     print('tabla: '+str(afn_tran_table))
     print('alfabeto: '+str(alfabeto))
 
-    '''tests..
-    sarray = ''
-    arr = sarray.split(',')
-    print(arr)
-    lala = ['a', 'b', 'c'] 
-    lele = ['a', 'b', 'c'] 
-    lili = ['a', 'c', 'b'] 
-    print(lala == lele)
-    print(lala == lili)'''
-
-    convertion_from_afn_to_afd(afn_tran_table,alfabeto)
-
+    afd_tran_table = convertion_from_afn_to_afd(afn_tran_table,alfabeto)
+    print('afd table: ')
+    print(str(afd_tran_table))
 
 
 
