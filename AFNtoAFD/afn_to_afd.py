@@ -12,10 +12,8 @@
 
 # imports _________________________
 import csv
-
 import pandas as pd
 import sys, getopt
-
 import os
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
 
@@ -296,6 +294,7 @@ def to_file(afd_tran_table,txtFile='afd_tran_table.txt'):
     '''
     Funcion que convierte el arreglo con la tabla de transiciones en arreglos del afd a un txt
     '''
+    #tran_table
     my_file = os.path.join(THIS_FOLDER, txtFile)
     f = open(my_file, "w")
     f.write(str(afd_tran_table))
@@ -310,7 +309,6 @@ def to_file(afd_tran_table,txtFile='afd_tran_table.txt'):
         for i in range(len(afnStates)):
             filewriter.writerow([afnStates[i],afdStates[i]])
     '''
-
 
 # Main______________________________________________
 def main():
