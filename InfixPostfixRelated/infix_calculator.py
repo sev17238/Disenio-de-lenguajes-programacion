@@ -4,8 +4,8 @@
 ######################################################
 # infix_calculator.py
 ######################################################
-# Python3 program to evaluate a given expression where 
-# tokens are separated by space or not.
+# Programa para evualuar una expresion aritmetica 
+# con espacios en blanco o no.
 ######################################################
 
 #Functions area______________________________________________

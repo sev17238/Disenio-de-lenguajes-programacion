@@ -23,6 +23,8 @@ Herramientas utilizadas en el proyecto:
 
 ## Referencias
  - Compilers: Principles, Techniques, & Tools. Second Edition.
+ - https://www.geeksforgeeks.org
+ - https://www.w3schools.com
 
 ## Licensia
 No license.

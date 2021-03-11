@@ -1,7 +1,7 @@
 Estado;a;b;epsilon
-0;0,1;0;1,7
-1;vacio;2;2,4
-2;vacio;2;vacio
+0;vacio;vacio;1,7
+1;vacio;vacio;2,4
+2;3;vacio;vacio
 3;vacio;vacio;6
 4;vacio;5;vacio
 5;vacio;vacio;6
