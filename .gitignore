@@ -132,3 +132,4 @@ dmypy.json
 #Custom log and test files
 logs/
 ref/
+test-output/
