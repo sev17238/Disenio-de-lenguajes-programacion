@@ -65,6 +65,60 @@ def get_precendence(character):
     precedence = 6 if precedence == None else precedence
     return precedence
 
+def replace_case_with_equivalent(regex):
+    eqRegex = regex
+    index = ''
+    equivalent = ''
+    substringToReplace = ''
+    addToIndex = 0
+    if(eqRegex.find('?') != -1):
+        index = eqRegex.find('?')
+        itemBeforeOp = eqRegex[index-1]
+        if(itemBeforeOp == ')'):
+            for i in range(index-1,-1,-1):
+                equivalent = eqRegex[i] + equivalent
+                addToIndex = addToIndex +1
+                if(eqRegex[i] == '('):
+                    break
+            substringToReplace = equivalent +'?'
+            equivalent = '('+equivalent+'|ε)'
+            print('finish reverse for')
+        else:
+            addToIndex = addToIndex +1
+            substringToReplace = itemBeforeOp+'?'
+            equivalent = '('+itemBeforeOp+'|ε)'
+        eqRegex = eqRegex.replace(substringToReplace,equivalent)
+    elif(eqRegex.find('+')):
+        index = eqRegex.find('+')
+        itemBeforeOp = eqRegex[index-1]
+        if(itemBeforeOp == ')'):
+            for i in range(index-1,-1,-1):
+                equivalent = eqRegex[i] + equivalent
+                addToIndex = addToIndex +1
+                if(eqRegex[i] == '('):
+                    break
+            substringToReplace = equivalent +'+'
+            equivalent = '('+equivalent+'*'+equivalent+')'
+            print('finish reverse for')
+        else:
+            addToIndex = addToIndex +1
+            substringToReplace = itemBeforeOp+'+'
+            equivalent = '('+itemBeforeOp+'*'+itemBeforeOp+')'
+        eqRegex = eqRegex.replace(substringToReplace,equivalent)
+
+    index = index + addToIndex
+    return eqRegex, index
+
+def replace_cases_with_equivalents(regex):
+    t=0
+    eqRegex, index = replace_case_with_equivalent(regex)
+    t = index
+    while(t < len(regex)):
+        if(eqRegex.find('?',index) != -1 or eqRegex.find('+',index) != -1):
+            eqRegex, index = replace_case_with_equivalent(regex)
+
+    return eqRegex
+
 def format_reg_ex(regex):
     ''' 
         Funcion que transforma una expresion regular insertando un '.' 
@@ -135,7 +189,7 @@ def infix_to_postfix(regex):
 def main():
     #regEx = str(sys.argv[1])
     
-    regEx1  = '(a*|b*)c'
+    '''regEx1  = '(a*|b*)c'
     regEx2  = '(b|b)*abb(a|b)*'
     regEx3  = '(a|ε)b(a+)c?'
     regEx4  = '(a|b)*a(a|b)(a|b)'
@@ -167,8 +221,12 @@ def main():
     print('postfix = ' + infix_to_postfix(regEx13));
     print('postfix = ' + infix_to_postfix(regEx14));
     print('postfix = ' + infix_to_postfix(regEx15));
-    print('postfix = ' + infix_to_postfix(regEx16));
-    
+    print('postfix = ' + infix_to_postfix(regEx16));'''
+
+    #print(replace_equivalent_expresions('(a|ε)b(a+)c?'))
+    print(replace_case_with_equivalent('(1|ε)?0?0*'))
+    print('poop')
+    print(replace_cases_with_equivalents('(1|ε)?0?0*'))
 
 if __name__ == "__main__":
     main()
