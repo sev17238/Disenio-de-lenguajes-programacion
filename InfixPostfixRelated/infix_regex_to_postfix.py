@@ -5,8 +5,9 @@
 # infix_regex_to_postfix.py
 ######################################################
 # Programa que evalua una expresion regular en notacion
-# infix y la traduce a notacion postfix usando el 
-# algoritmo de Shunting-yard.
+# infix, sustituye operadores equivalentes y la 
+# traduce a notacion postfix usando el algoritmo 
+# de Shunting-yard.
 ######################################################
 
 #Descripcion de algoritmo______________________________________________
@@ -41,7 +42,7 @@ operators_precedence = {
 #Functions area______________________________________________
 def get_key(character):
     '''
-    Funcion que returna la llave para un caracter cualquiera.
+    Funcion que retorna la llave para un caracter cualquiera.
 
     Parametros:
      - character: un caracter o token 
@@ -65,14 +66,41 @@ def get_precendence(character):
     precedence = 6 if precedence == None else precedence
     return precedence
 
-def replace_case_with_equivalent(regex):
+def replace_case_with_equivalent(regex,t=0):
+    '''
+    Funcion que reemplaza el operador a? o el operador a+ por sus equivalentes. 
+    Eq. r+ = r|r*, r? = r|ε
+
+    Parametros:
+     - regex: una expresion regular con posibles operadores ? o +
+     - t: una posicion mas del indice donde se encontro el ultimo caracter y se le reemplazo (a|b)a?a* => (a|b)(a|ε)a* => t = 10
+     - retorna cadena equivalente sustituyendo una ocurrencia de ? o +
+    '''
     eqRegex = regex
-    index = ''
+    index = 0
     equivalent = ''
     substringToReplace = ''
     addToIndex = 0
-    if(eqRegex.find('?') != -1):
-        index = eqRegex.find('?')
+    opQ = eqRegex.find('?',t)
+    opPlus = eqRegex.find('+',t)
+    Q = False
+    Plus = False
+    if(opQ != -1 and opPlus != -1):
+        if(opQ > opPlus):
+            index = opPlus
+            Plus = True
+        else:
+            index = opQ
+            Q = True
+    elif(opQ != -1):
+        index = opQ
+        Q = True
+    elif(opPlus != -1):
+        index = opPlus
+        Plus = True
+
+    if(Q == True):
+        #index = eqRegex.find('?',t)
         itemBeforeOp = eqRegex[index-1]
         if(itemBeforeOp == ')'):
             for i in range(index-1,-1,-1):
@@ -82,14 +110,14 @@ def replace_case_with_equivalent(regex):
                     break
             substringToReplace = equivalent +'?'
             equivalent = '('+equivalent+'|ε)'
-            print('finish reverse for')
+            #print('finish reverse for')
         else:
             addToIndex = addToIndex +1
             substringToReplace = itemBeforeOp+'?'
             equivalent = '('+itemBeforeOp+'|ε)'
         eqRegex = eqRegex.replace(substringToReplace,equivalent)
-    elif(eqRegex.find('+')):
-        index = eqRegex.find('+')
+    if(Plus == True):
+        #index = eqRegex.find('+',t)
         itemBeforeOp = eqRegex[index-1]
         if(itemBeforeOp == ')'):
             for i in range(index-1,-1,-1):
@@ -98,24 +126,38 @@ def replace_case_with_equivalent(regex):
                 if(eqRegex[i] == '('):
                     break
             substringToReplace = equivalent +'+'
-            equivalent = '('+equivalent+'*'+equivalent+')'
-            print('finish reverse for')
+            equivalent = '('+equivalent+''+equivalent+'*)'
+            #print('finish reverse for')
         else:
             addToIndex = addToIndex +1
             substringToReplace = itemBeforeOp+'+'
-            equivalent = '('+itemBeforeOp+'*'+itemBeforeOp+')'
+            equivalent = '('+itemBeforeOp+''+itemBeforeOp+'*)'
         eqRegex = eqRegex.replace(substringToReplace,equivalent)
 
     index = index + addToIndex
     return eqRegex, index
 
 def replace_cases_with_equivalents(regex):
+    '''
+    Funcion que utiliza replace_case_with_equivalent() recuerrentemente para convertir todos los a? y a+
+    a sus equivalentes.
+
+    Parametros:
+     - regex: expresion regular
+     - return - la expresion regular con todos los casos equivalentes
+    '''
     t=0
-    eqRegex, index = replace_case_with_equivalent(regex)
-    t = index
-    while(t < len(regex)):
-        if(eqRegex.find('?',index) != -1 or eqRegex.find('+',index) != -1):
-            eqRegex, index = replace_case_with_equivalent(regex)
+    eqLastRegex, index = replace_case_with_equivalent(regex)
+    eqRegex = eqLastRegex
+    if(eqLastRegex != regex):
+        t = index
+        while(t < len(eqRegex)):
+            if(eqLastRegex.find('?',t) != -1 or eqLastRegex.find('+',t) != -1):
+                eqLastRegex, index = replace_case_with_equivalent(eqLastRegex,t)
+                eqRegex = eqLastRegex
+                t = index
+            else:
+                t = t+1
 
     return eqRegex
 
@@ -189,7 +231,8 @@ def infix_to_postfix(regex):
 def main():
     #regEx = str(sys.argv[1])
     
-    '''regEx1  = '(a*|b*)c'
+    '''
+    regEx1  = '(a*|b*)c'
     regEx2  = '(b|b)*abb(a|b)*'
     regEx3  = '(a|ε)b(a+)c?'
     regEx4  = '(a|b)*a(a|b)(a|b)'
@@ -221,12 +264,23 @@ def main():
     print('postfix = ' + infix_to_postfix(regEx13));
     print('postfix = ' + infix_to_postfix(regEx14));
     print('postfix = ' + infix_to_postfix(regEx15));
-    print('postfix = ' + infix_to_postfix(regEx16));'''
+    print('postfix = ' + infix_to_postfix(regEx16));
+    '''
 
     #print(replace_equivalent_expresions('(a|ε)b(a+)c?'))
-    print(replace_case_with_equivalent('(1|ε)?0?0*'))
-    print('poop')
-    print(replace_cases_with_equivalents('(1|ε)?0?0*'))
+
+    #print('cadena original: (a|ε)b(a+)c?b+(a|b)?')
+    #print(replace_cases_with_equivalents('(a|ε)b(a+)c?b+(a|b)?'))
+    #print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|ε)b(a+)c?b+(a|b)?')).replace('..','.'))
+    #print('h')
+    #print('cadena original: (a*|b*)c')
+    #print(replace_cases_with_equivalents('(a*|b*)c'))
+    #print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a*|b*)c')).replace('..','.'))
+
+    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('a(ba)+')).replace('..','.'))
+    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('a(b*)a')).replace('..','.'))
+    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('a|b')).replace('..','.'))
+
 
 if __name__ == "__main__":
     main()

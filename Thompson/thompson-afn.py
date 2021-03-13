@@ -9,29 +9,62 @@
 ######################################################
 
 # imports _________________________
+import sys
+sys.path.append(".")
+from graphs.Node import Node
+from graphs.Graph import Graph
 
-def generate_or_afn(a,b):
+#constants _________________________
+node_init_name = 'init'
+node_accept_name = 'accept'
+
+#Functions _________________________
+
+def token_afn(a):
+    '''
+    Funcion para generar el par de nodos correspondientes.
+    Ej. (Ni) --a--> (Nf)
+
+    Parametros:
+     - a - token cualquiera del alfabeto en cuestion que servira como transicion entre ambos nodos
+    '''
+    relation = node_init_name+','+a+','+node_accept_name
+    node1 = Node(value=node_init_name,relations=[relation],isInitial=True)
+    node2 = Node(value=node_accept_name,isAccepting=True)
+    nodes = [node1,node2]
+    return nodes
+
+def concat_afn(A,B,i):
+    '''
+    Funcion para concatenar caracteres. 
+        Ej. (Gi) --a--> (Nu) --b--> (Gf)
+    - Nodo de union entre ambos grafos. Es el final de Gi y el inicial de Gf.
+
+    Parametros:
+     - A, B - arreglos conteniendo los nodos de un grafo cualguiera. Estos grafos se concatenaran.
+     - i - el valor del nodo intermedio
+    '''
+
+    #relation1 = node_init_name+','+a+','+str(i)
+    #relation2 = str(i)+','+b+','+node_accept_name
+    #node1 = Node(value=node_init_name,relations=[relation1],isInitial=True)
+    #node2 = Node(value=str(i),relations=[relation2])
+    #node3 = Node(value=node_accept_name,isAccepting=True)
+    #nodes = [node1,node2,node3]
+    #return nodes
+
+def or_afn(postfix):
+
     result = []
 
     return result
 
-def generate_kleene_afn():
+def kleene_afn():
     result = []
 
     return result
 
-def generate_concat_afn():
-    result = []
-
-    return result
-
-def get_afns_concat():
-
-    result=[]
-
-    return result
-
-def construccion():
+def tests():
     chil = 5
     return chil
 
