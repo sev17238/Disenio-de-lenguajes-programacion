@@ -28,13 +28,13 @@ def token_afn(a):
     Parametros:
      - a - token cualquiera del alfabeto en cuestion que servira como transicion entre ambos nodos
     '''
-    relation = node_init_name+','+a+','+node_accept_name
+    relation = a+','+node_accept_name
     node1 = Node(value=node_init_name,relations=[relation],isInitial=True)
     node2 = Node(value=node_accept_name,isAccepting=True)
     nodes = [node1,node2]
     return nodes
 
-def concat_afn(A,B,i):
+def concat_afn(A,B):
     '''
     Funcion para concatenar caracteres. 
         Ej. (Gi) --a--> (Nu) --b--> (Gf)
@@ -52,67 +52,62 @@ def concat_afn(A,B,i):
     #encontramos el nodo final del grafo A que se convertira en el nodo inicial del grafo B
     for i in range(len(graphA)):
         node = graphA[i]
-        if(node.isAccepting()):
-            ga_node_final_pos = i
-            node.isAccepting(False)
+        if(node.getIsAccepting()):
+            #ga_node_final_pos = i
+            node.setIsAccepting(False)
+            #nodo final del grafo A
+            #ga_final_node = node
             break
     #eliminamos el nodo inicial del grafo B ya que este sera reemplazado por el nodo final del grafo A
     for i in range(len(graphB)):
         node = graphB[i]
-        if(node.isInitial()):
-            gb_node_init = node #se almacena nodo eliminado 
-            graphB.pop(i) #graphB = [nodei,nodef] --> [nodef]
-        graphA.append(node)
-    
-    #grafo con las relaciones de ambos grafos A y B
-    #NOTA: se deben actualizar relaciones y enumerar de nuevo a los nodos del grafo B
-    graphAB = graphA 
-    
-    #nodo final del grafo A
-    ga_final_node = graphAB[ga_node_final_pos]
+        if(node.getIsInitial()):
+            #gb_node_init = node #se almacena nodo eliminado 
+            gb_node_init = graphB.pop(i) #graphB = [nodei,nodef] --> [nodef] !esta operacion no es necesaria ya que este nodo no se toma en cuenta
+            break
 
     #se recorren las relaciones del nodo eliminado en el grafo B y se copian al nodo final del grafo A
     for i in range(len(gb_node_init.getRelations())):
         '''if(len(gb_node_init.getRelations())>1):'''
         relation = gb_node_init.getRelations()[i]
         #valor viejo de destino de la transicion
-        old_d = int(relation[2])
-        
+        old_destiny = int(relation[2])
+
         #se crea una nueva relacion reemplazando el valor de destino y copiando la transicion. Ej. (b,old_d) --> (b,new_d)
         #y se suman el valor del nodo final y el valor viejo de la relacion para actualizar correctamente la relacion
-        relation = relation[0:1]+str(int(ga_final_node.getValue())+old_d) 
-
+        relation = relation[0:2]+str(int(graphA[len(graphA)-1].getValue())+old_destiny) 
+        print('thom: '+str(relation))
         #se agrega la relacion
-        ga_final_node.setRelation(relation)
+        graphA[len(graphA)-1].setRelation(relation) #nodo final grafo A
         '''else:
             relation = gb_node_init.getRelations()[i]
             #se crea una nueva relacion reemplazando el valor de destino y copiando la transicion. Ej. (b,old_d) --> (b,new_d)
             relation = relation[0:1]+str((int(ga_final_node.getValue())+1))
             ga_final_node.setRelation(relation)'''
 
-    val = int(ga_final_node.getValue())
+    val = int(graphA[len(graphA)-1].getValue())
     old_val = ''
     #enumeracion de los nodos del grafo B a partir del valor del nodo final del grafo A
     #NOTA: se deben actualizar las relaciones entre nodos con estos nuevos valores
-    for i in range(ga_node_final_pos+1,len(graphAB)): #+1 porque queremos el nodo que viene luego del nodo final del grafo A
+    # Ej. graphA = [nodei,node2,nodef] graphB = [node2,nodef]
+    for i in range(len(graphB)): #porque queremos el nodo que viene luego del nodo final del grafo A que ya tiene sus relaciones actualizadas
         val = val + 1 
         node = graphB[i] 
         old_val = node.getValue()
         node.setValue(str(val)) 
 
-        for e in range(i+1,len(graphAB)): #+1 porque queremos ver si los nodos siguientes se conectan con este nodo
-            node_n = graphAB(e)
+        for e in range(i+1,len(graphB)): #empezamos en +1 porque queremos ver si los nodos siguientes se conectan con este nodo
+            node_n = graphB(e)
             if(len(node_n.getRelations()) > 0):
                 for r in range(len(node_n.getRelations())):
                     rel = node.getRelations()[r]
                     if(rel[2] == old_val): #si este nodo tiene de destino al nodo que se le acaba de cambiar el valor
                         node.modifyDestinyRelation(r,str(val)) #se reemplaza el valor de destino de la relacion
 
+        graphA.append(node)
 
-
-
-
-
+    #grafo con los nodos del grafo A y B
+    return graphA 
 
 
 def or_afn(postfix):

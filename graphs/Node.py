@@ -45,7 +45,8 @@ class Node:
         self.value = value
 
     def setRelation(self,relation):
-        self.relations.append(relation)
+        if(self.getIsAccepting() == False):
+            self.relations.append(relation)
 
     def setIsInitial(self,state):
         self.isInitial = state
@@ -63,11 +64,11 @@ class Node:
 
     def modifyDestinyRelation(self,i,new_destinty_node): #'A,a,B'
         relation = self.relations[i]
-        relation = relation[0:1]+new_destinty_node
+        relation = relation[0:2]+new_destinty_node
         #temp = list(relation)
         #temp[4] = new_destinty_node
         #relation = "".join(temp)
-        print(relation)
+        print('node: '+str(relation))
         self.relations[i] = relation
 
     #def modifyOriginRelation(self,i,new_origin_node): #'A,a,B'
