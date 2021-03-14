@@ -63,10 +63,12 @@ class Node:
 
     def modifyDestinyRelation(self,i,des_node_o,des_node_new): #'A,a,B'
         relation = self.relations[i]
-        temp = list(relation)
-        temp[4] = des_node_new
-        relation = "".join(temp)
-        #relation = relation.replace(des_node_o,des_node_new,1)
+        relation = relation[0:3]+des_node_new
+       
+        #temp = list(relation)
+        #temp[4] = des_node_new
+        #relation = "".join(temp)
+
         print(relation)
         self.relations[i] = relation
 
