@@ -61,14 +61,18 @@ class Node:
     def popRelation(self,i):
         return self.relations.pop(i)
 
-    def modifyDestinyRelation(self,i,des_node_o,des_node_new): #'A,a,B'
+    def modifyDestinyRelation(self,i,new_destinty_node): #'A,a,B'
         relation = self.relations[i]
-        relation = relation[0:3]+des_node_new
-       
+        relation = relation[0:1]+new_destinty_node
         #temp = list(relation)
-        #temp[4] = des_node_new
+        #temp[4] = new_destinty_node
         #relation = "".join(temp)
-
         print(relation)
         self.relations[i] = relation
+
+    #def modifyOriginRelation(self,i,new_origin_node): #'A,a,B'
+    #    relation = self.relations[i]
+    #    relation = new_origin_node+relation[1:4]
+    #    print(relation)
+    #    self.relations[i] = relation
 

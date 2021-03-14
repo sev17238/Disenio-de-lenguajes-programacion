@@ -57,10 +57,10 @@ class Graph:
             if(len(node.getRelations()) > 1):
                 for e in range(len(node.getRelations())):
                     rel = node.getRelations()[e]
-                    dot.edge(val, rel[4],label=rel[2])
+                    dot.edge(val, rel[2],label=rel[0])
             elif(len(node.getRelations()) == 1):
                 rel = node.getRelations()[0]
-                dot.edge(val, rel[4],label=rel[2])
+                dot.edge(val, rel[2],label=rel[0])
         
         dot.attr(label=r'\n'+self.name,fontsize='10')
         #dot.unflatten(stagger=3)
@@ -70,9 +70,9 @@ class Graph:
 
 # Main________________________________________________
 def main(): 
-    nodeA = Node('A',['A,b,D','A,a,C']) 
-    nodeB = Node('B',['B,a,C','B,b,A']) 
-    nodeC = Node('C',['C,b,D','C,a,B']) 
+    nodeA = Node('A',['b,D','a,C']) 
+    nodeB = Node('B',['a,C','b,A']) 
+    nodeC = Node('C',['b,D','a,B']) 
     nodeD = Node('D') 
     arr = [nodeA,nodeB,nodeC,nodeD]
 
