@@ -38,13 +38,20 @@ class Graph:
     #others
     def drawGraph(self):
         file_name = 'graphs-output/'+self.name
-        dot = Digraph(comment='Test 1',filename=file_name,
-        node_attr={'color': 'lightblue1', 'style': 'filled'})
-        #dot.attr('node',style='filled',color='lightgrey')
+        dot = Digraph(comment='Test 1',filename=file_name)
+        dot.attr(size='8,5')
+        dot.attr('node', shape='circle')
+        dot.attr('node',style='filled',color='lightgrey')
 
         nodes = self.nodes
         for i in range(len(nodes)):
             node = nodes[i]
+            print(node.getIsAccepting())
+            print(node.getRelations())
+            if(node.getIsAccepting()):
+                dot.attr('node', shape='doublecircle')
+                val = node.getValue()
+
             val = node.getValue()
             dot.node(val, val)
             if(len(node.getRelations()) > 1):
@@ -54,10 +61,9 @@ class Graph:
             elif(len(node.getRelations()) == 1):
                 rel = node.getRelations()[0]
                 dot.edge(val, rel[4],label=rel[2])
-            else: 
-                continue
         
-        dot.attr(label=r'\nDiego Sevilla\n17238',fontsize='10')
+        dot.attr(label=r'\n'+self.name,fontsize='10')
+        #dot.unflatten(stagger=3)
         #dot.render('test-output/test3.gv', view=True)
         dot.view()
 

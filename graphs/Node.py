@@ -31,6 +31,9 @@ class Node:
     def getRelations(self):
         return self.relations
 
+    def getSpecificRelation(self,i):
+        return self.relations[i]
+
     def getIsInitial(self):
         return self.isInitial
 
@@ -54,4 +57,16 @@ class Node:
     #others
     def resetRelations(self):
         self.relations = []
+
+    def popRelation(self,i):
+        return self.relations.pop(i)
+
+    def modifyDestinyRelation(self,i,des_node_o,des_node_new): #'A,a,B'
+        relation = self.relations[i]
+        temp = list(relation)
+        temp[4] = des_node_new
+        relation = "".join(temp)
+        #relation = relation.replace(des_node_o,des_node_new,1)
+        print(relation)
+        self.relations[i] = relation
 

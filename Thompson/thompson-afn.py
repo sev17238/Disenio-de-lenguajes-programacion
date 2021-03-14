@@ -15,8 +15,8 @@ from graphs.Node import Node
 from graphs.Graph import Graph
 
 #constants _________________________
-node_init_name = 'init'
-node_accept_name = 'accept'
+node_init_name = '0'
+node_accept_name = '1'
 
 #Functions _________________________
 
