@@ -12,22 +12,16 @@ class Node:
     Clase para representar a un nodo.
 
     Atributos:
-     - value = el valor del nodo
-     - relations = arreglo de relaciones Ej. ['A,a,B','A,b,C','A,ε,D'] en el caso donde value = 'A'
+     - relations = arreglo de relaciones tipo Relacion()
      - isInitial = es inicial
      - isAccepting = es final o de aceptacion
-
     '''
-    def __init__(self,value,relations=[],isInitial=False,isAccepting=False):
-        self.value = value
+    def __init__(self,relations=[],isInitial=False,isAccepting=False):
         self.relations = relations
         self.isInitial = isInitial
         self.isAccepting = isAccepting
 
     #gets
-    def getValue(self):
-        return self.value
-
     def getRelations(self):
         return self.relations
 
@@ -41,12 +35,11 @@ class Node:
         return self.isAccepting
 
     #sets
-    def setValue(self,value):
-        self.value = value
-
     def setRelation(self,relation):
-        if(self.getIsAccepting() == False):
-            self.relations.append(relation)
+        self.relations.append(relation)
+
+    def setRelations(self,relations):
+        self.relations = relations
 
     def setIsInitial(self,state):
         self.isInitial = state
@@ -62,18 +55,15 @@ class Node:
     def popRelation(self,i):
         return self.relations.pop(i)
 
-    def modifyDestinyRelation(self,i,new_destinty_node): #'A,a,B'
-        relation = self.relations[i]
-        relation = relation[0:2]+new_destinty_node
-        #temp = list(relation)
-        #temp[4] = new_destinty_node
-        #relation = "".join(temp)
-        print('node: '+str(relation))
-        self.relations[i] = relation
+    def modifyRelationDestiny(self,i,new_destiny_node): 
+        relation = self.relations[i].setDestiny(new_destiny_node)
 
-    #def modifyOriginRelation(self,i,new_origin_node): #'A,a,B'
-    #    relation = self.relations[i]
-    #    relation = new_origin_node+relation[1:4]
-    #    print(relation)
-    #    self.relations[i] = relation
+    def copyNodeAtributes(self):
+        return self.relations,self.isInitial,self.isAccepting
+
+    def pasteNodeAtributes(self,relations,isInitial,isAccepting):
+        self.relations = relations
+        self.isInitial = isInitial
+        self.isAccepting = isAccepting
+
 
