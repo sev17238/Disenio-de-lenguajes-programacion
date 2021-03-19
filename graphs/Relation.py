@@ -12,10 +12,10 @@ class Relation:
     Clase para representar a un nodo.
 
     Atributos:
-     - origin = the origin node
-     - token = the token
-     - destiny = the destiny node
-    '''
+     - origin = the origin node type(str)
+     - token = the token type(str)
+     - destiny = the destiny node type(str)
+    ''' 
     def __init__(self,origin,token,destiny):
         self.origin = origin
         self.token = token

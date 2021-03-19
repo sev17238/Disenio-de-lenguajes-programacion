@@ -50,6 +50,8 @@ class GraphGUI:
                     dot.edge(val, rel.getDestiny(),label=rel.getToken())
             elif(len(node.getRelations()) == 1):
                 rel = node.getSpecificRelation(0)
+                print('origin,token,destiny')
+                print(rel.getOrigin(),rel.getToken(),rel.getDestiny())
                 dot.edge(val, rel.getDestiny(),label=rel.getToken())
 
         dot.attr(label=r'\n'+self.name,fontsize='10')

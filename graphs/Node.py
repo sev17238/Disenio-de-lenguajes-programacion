@@ -26,7 +26,10 @@ class Node:
         return self.relations
 
     def getSpecificRelation(self,i):
-        return self.relations[i]
+        if(len(self.relations) == 0):
+            return None
+        else:
+            return self.relations[i]
 
     def getIsInitial(self):
         return self.isInitial
