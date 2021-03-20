@@ -26,6 +26,9 @@ Herramientas utilizadas en el proyecto:
  - https://www.geeksforgeeks.org
  - https://www.w3schools.com
 
+## Funcionamiento
+ - Proximamente `LINK A YOUTUBE`
+
 ## Licensia
 No license.
 
