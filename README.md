@@ -27,7 +27,7 @@ Herramientas utilizadas en el proyecto:
  - https://www.w3schools.com
 
 ## Funcionamiento
- - Proximamente `LINK A YOUTUBE`
+ - YouTube: https://youtu.be/saJP_B_sPcA
 
 ## Licensia
 No license.
