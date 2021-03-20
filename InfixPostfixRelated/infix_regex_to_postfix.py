@@ -27,6 +27,7 @@ This already shows a couple of rules:
     At the end of reading the expression, pop all operators off the stack and onto the output.
 '''
 
+
 #constants area______________________________________________
 '''Diccionario de precedencias'''
 operators_precedence = {
@@ -69,7 +70,7 @@ def get_precendence(character):
 def replace_case_with_equivalent(regex,t=0):
     '''
     Funcion que reemplaza el operador a? o el operador a+ por sus equivalentes. 
-    Eq. r+ = r|r*, r? = r|ε
+    Eq. r+ = rr*, r? = r|ε
 
     Parametros:
      - regex: una expresion regular con posibles operadores ? o +
@@ -268,27 +269,27 @@ def main():
     '''
 
     #E. R. CORRECTAS
-    print('EXPRESIONES REGULARES CORRECTAS ----')
-    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|b)*a(a|b)(a|b)+')).replace('..','.'))
-    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('((1?)*)*')).replace('..','.'))
-    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|ε)b(a+)c?')).replace('..','.'))
-    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(1|0)+001')).replace('..','.'))
-    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|ε)b(a+)c?')).replace('..','.'))
-    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(εa|εb)*abb')).replace('..','.'))
+    #print('EXPRESIONES REGULARES CORRECTAS ----')
+    #print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|b)*a(a|b)(a|b)+')).replace('..','.'))
+    #print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('((1?)*)*')).replace('..','.'))
+    #print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|ε)b(a+)c?')).replace('..','.'))
+    #print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(1|0)+001')).replace('..','.'))
+    #print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|ε)b(a+)c?')).replace('..','.'))
+    #print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(εa|εb)*abb')).replace('..','.'))
 
     #E. R. Incorrectas (manejo de errores)
-    '''print('EXPRESIONES REGULARES INCORRECTAS ----')
-    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|b*a(a|b)(a|b)+')).replace('..','.'))
+    print('EXPRESIONES REGULARES INCORRECTAS ----')
     print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|b)*a(a|b)(a|b)+')).replace('..','.'))
-    print()
-    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('((1?)**')).replace('..','.'))
-    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(1?)*')).replace('..','.'))
-    print()
-    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|ε)b(a+c?')).replace('..','.'))
-    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|ε)b(a+c?)')).replace('..','.'))
-    print()
-    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(εa|εb)*(ab)b')).replace('..','.'))
-    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(εa|εb)*ab)b')).replace('..','.'))'''
+    #print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|b)*a(a|b)(a|b)+')).replace('..','.'))
+    #print()
+    #print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('((1?)**')).replace('..','.'))
+    #print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(1?)*')).replace('..','.'))
+    #print()
+    #print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|ε)b(a+c?')).replace('..','.'))
+    #print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|ε)b(a+c?)')).replace('..','.'))
+    #print()
+    #print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(εa|εb)*(ab)b')).replace('..','.'))
+    #print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(εa|εb)*ab)b')).replace('..','.'))
     
 
     
