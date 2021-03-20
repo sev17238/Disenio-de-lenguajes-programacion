@@ -57,7 +57,7 @@ class GraphGUI:
         dot.attr(label=r'\n'+self.name,fontsize='10')
         #dot.unflatten(stagger=3)
         # dot.render('test-output/test3.gv', view=True)
-        dot.render()
+        dot.render(view=True)
         #dot.view()
 
 

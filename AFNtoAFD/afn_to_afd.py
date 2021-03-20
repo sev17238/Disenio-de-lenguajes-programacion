@@ -16,8 +16,8 @@ import pandas as pd
 import sys, getopt
 import os
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
-OUTPUTFILENAMES = ['afd-transitions-x-2.txt','afd-tran-table-x-2.txt']
-INPUTFILENAME = 'afn-tran-table-x-2.csv'
+OUTPUTFILENAMES = ['afd-transitions-p3.txt','afd-tran-table-p3.txt']
+INPUTFILENAME = 'afn-tran-table-p3.csv'
 
 #constants area______________________________________________
 '''Abecedario'''

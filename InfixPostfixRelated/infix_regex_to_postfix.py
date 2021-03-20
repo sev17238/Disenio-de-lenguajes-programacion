@@ -126,12 +126,12 @@ def replace_case_with_equivalent(regex,t=0):
                 if(eqRegex[i] == '('):
                     break
             substringToReplace = equivalent +'+'
-            equivalent = '('+equivalent+''+equivalent+'*)'
+            equivalent = '('+equivalent+')('+equivalent+')*'
             #print('finish reverse for')
         else:
             addToIndex = addToIndex +1
             substringToReplace = itemBeforeOp+'+'
-            equivalent = '('+itemBeforeOp+''+itemBeforeOp+'*)'
+            equivalent = '('+itemBeforeOp+')('+itemBeforeOp+')*'
         eqRegex = eqRegex.replace(substringToReplace,equivalent)
 
     index = index + addToIndex
@@ -267,19 +267,31 @@ def main():
     print('postfix = ' + infix_to_postfix(regEx16));
     '''
 
-    #print(replace_equivalent_expresions('(a|ε)b(a+)c?'))
+    #E. R. CORRECTAS
+    print('EXPRESIONES REGULARES CORRECTAS ----')
+    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|b)*a(a|b)(a|b)+')).replace('..','.'))
+    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('((1?)*)*')).replace('..','.'))
+    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|ε)b(a+)c?')).replace('..','.'))
+    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(1|0)+001')).replace('..','.'))
+    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|ε)b(a+)c?')).replace('..','.'))
+    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(εa|εb)*abb')).replace('..','.'))
 
-    #print('cadena original: (a|ε)b(a+)c?b+(a|b)?')
-    #print(replace_cases_with_equivalents('(a|ε)b(a+)c?b+(a|b)?'))
-    #print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|ε)b(a+)c?b+(a|b)?')).replace('..','.'))
-    #print('h')
-    #print('cadena original: (a*|b*)c')
-    #print(replace_cases_with_equivalents('(a*|b*)c'))
-    #print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a*|b*)c')).replace('..','.'))
+    #E. R. Incorrectas (manejo de errores)
+    '''print('EXPRESIONES REGULARES INCORRECTAS ----')
+    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|b*a(a|b)(a|b)+')).replace('..','.'))
+    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|b)*a(a|b)(a|b)+')).replace('..','.'))
+    print()
+    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('((1?)**')).replace('..','.'))
+    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(1?)*')).replace('..','.'))
+    print()
+    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|ε)b(a+c?')).replace('..','.'))
+    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(a|ε)b(a+c?)')).replace('..','.'))
+    print()
+    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(εa|εb)*(ab)b')).replace('..','.'))
+    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('(εa|εb)*ab)b')).replace('..','.'))'''
+    
 
-    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('a(ba)+')).replace('..','.'))
-    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('a(b*)a')).replace('..','.'))
-    print('postfix = ' + infix_to_postfix(replace_cases_with_equivalents('a|b')).replace('..','.'))
+    
 
 
 if __name__ == "__main__":

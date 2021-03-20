@@ -94,6 +94,9 @@ def updateNodeRelations_initFinal(graphAB,start):
     #for i in range(len(graphAB)-1,len(graphB)):
     while(i < len(graphAB)):
         node = graphAB.get(i)
+        if(i+1 > len(graphAB)):
+            node.resetRelations()
+            
         #Para nodos con una solo relacion
         if(len(node.getRelations()) == 1):
             rel = node.getSpecificRelation(0)
@@ -159,7 +162,7 @@ def concat_afn(A={0:Node()},B={0:Node()}):
     graphB = B
 
     gb_node_init = graphB.get(0)
-    #gb_node_init.setIsInitial(False)
+    gb_node_init.setIsInitial(False)
 
     #se copian atributos del nodo inicial del grafo B, y se pegan al nodo final del grafo A
     relations_,isInit_,isAccept_ = gb_node_init.copyNodeAtributes() 
@@ -179,8 +182,13 @@ def concat_afn(A={0:Node()},B={0:Node()}):
     #graphA_ = collections.OrderedDict(sorted(graphA.items()))
 
     graphAB = {}
+    
+    #graphA[lenA].resetRelations() 
     #graphAB = updateNodeRelations(graphA,1)
     graphAB = updateNodeRelations_initFinal(graphA,0)
+
+    lenAB = len(graphAB)
+    graphAB.get(lenAB-1).resetRelations()
 
     #grafo con los nodos del grafo A y B
     return graphAB
@@ -197,10 +205,10 @@ def or_afn(A={0:Node()},B={0:Node()}):
     graphB = B
 
     ##los nodos finales e iniciales de los grafos A y B ya no tendran esta etiqueta
-    #graphA.get(len(graphA)-1).setIsAccepting(False)
-    #graphA.get(0).setIsInitial(False)
-    #graphB.get(len(graphB)-1).setIsAccepting(False)
-    #graphB.get(0).setIsInitial(False)
+    graphA.get(len(graphA)-1).setIsAccepting(False)
+    graphA.get(0).setIsInitial(False)
+    graphB.get(len(graphB)-1).setIsAccepting(False)
+    graphB.get(0).setIsInitial(False)
 
     #el nodo inicial (aun no se haran las relaciones ε hacia A y B debido a que no se a enumerado)
     node_i = Node(isInitial=True)

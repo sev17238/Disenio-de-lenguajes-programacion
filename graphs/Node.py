@@ -69,4 +69,8 @@ class Node:
         self.isInitial = isInitial
         self.isAccepting = isAccepting
 
+    def clearStates(self):
+        self.isInitial = False
+        self.isAccepting = False
+
 
