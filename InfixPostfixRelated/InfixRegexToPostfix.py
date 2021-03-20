@@ -234,8 +234,8 @@ class InfixRegexToPostfix:
         if(postfix.find('(') != -1):
             postfix = 'ERROR_POSTFIX_)'
 
-        print('infix     = '+regex)
-        print('infixEq   = '+eqRegex)
+        print(' - infix     = '+regex)
+        print(' - infixEq   = '+eqRegex)
         #print('postfix   = '+postfix)
         return postfix.replace('..','.')
 
