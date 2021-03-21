@@ -4,17 +4,16 @@
 ######################################################
 # RelationT.py
 ######################################################
-# Clase que representa una relacion entre 2 nodos
-######################################################
 
 class RelationT:
     '''
-    Clase para representar a un nodo.
+    Clase que representa una relacion entre 2 nodos
+    tomando en cuenta el algoritmo de thompsons
 
     Atributos:
-     - origin = the origin node type(str)
-     - token = the token type(str)
-     - destiny = the destiny node type(str)
+     - origin = the origin node 
+     - token = the token 
+     - destiny = the destiny node 
     ''' 
     def __init__(self,origin,token,destiny):
         self.origin = origin
@@ -31,12 +30,10 @@ class RelationT:
     def getDestiny(self):
         return self.destiny
 
-    #sets
-    def setOrigin(self,origin):
-        self.origin = origin
+    def getRelationAttributes(self):
+        return self.origin, self.token, self.destiny
 
-    def setToken(self,token):
-        self.token = token
-
-    def setDestiny(self,destiny):
-        self.destiny = destiny
+    #others
+    def updateRelation(self,dictionary):
+        self.origin = dictionary[self.origin]
+        self.destiny = dictionary[self.destiny]

@@ -9,7 +9,7 @@
 import time
 import collections
 from functions import *
-from graphs.NodeT import NodeT
+from graphs.NodeT import *
 from graphs.RelationT import RelationT
 import sys
 sys.path.append(".")
@@ -77,22 +77,67 @@ class AFNT:
         - a - token cualquiera del alfabeto en cuestion que servira como transicion entre ambos nodos
         - return - un grafo pequeño compuesto por dos nodos
         '''
+        #se crea un grafo local
         localGraph = {}
         counter = 0
 
-        # Relacion: origen ---a---> Destino
-        relation = RelationT(str(counter),a,str(counter+1))
         #Nodo inicial y final
-        node1 = NodeT(isInitial=True,relation=[relation])
+        node1 = NodeT(isInitial=True)
         node2 = NodeT(isAccepting=True)
 
+        # Relacion: origen ---a---> Destino
+        relation = RelationT(counter,a,counter+1)
+        node1.addRelation(relation)
+
+        #estos nodos se agregan al grafo local
         localGraph[counter] = node1
         localGraph[counter+1] = node2
 
+        #colocamos este grafo local en el AFN global
         self.AFNArray.append(localGraph)
 
         self.acceptNode = self.currentNode
+        #Se suma 2 al valor del nodo en cuestion ya que se agregaron 2 nodos
         self.currentNode += 2
+
+    def concat_afn(self):
+        '''
+        Funcion para concatenar 2 grafos cualesquiera. 
+            Ej. (Gi) --a--> (Nu) --b--> (Gf)
+        - El nodo final de Gi se convierte en el nodo inicial de Gf.
+
+        Esta funcion no recibe parametros ya que concatenara dos grafos o 
+        AFNs que se encuentren en el array global de afns (AFNArray).
+        '''
+        # se crea un grafo local
+        localGraph = {}
+        #Este contador actualiza los estados de los nodos
+        counter = -1
+
+        #obtenemos los grafos a concatenar
+        graph1 = self.AFNArray.pop()
+        graph2 = self.AFNArray.pop()
+
+        #Se actualizan los estados de cada nodo del grafo1
+        afnCounter1, newAFN1 = updateNodesId(counter,graph1)
+        #se obtiene el id del nodo de aceptacion del nuevo grafo o afn
+        id_fnode_graph1, newAFN1 = getAcceptingNodeId(newAFN1)
+
+        #se obtiene el id final del nodo del grafo 1 y se actualiza
+        
+        #actualizamos los estados del afn2
+        afnCounter2, newAFN2 = updateNodesId(afnCounter1-1,graph2)
+        id_fnode_graph2, newAFN2 = getInitialNodeId(newAFN2)
+
+        counter = afnCounter2
+
+        localGraph.update(newAFN1)
+        localGraph.update(newAFN2)
+
+        #colocamos el resultado de la concatenacion en el array de afns
+        self.AFNArray.append(localGraph)
+
+        return 0
 
     def or_afn(self):
 
@@ -102,9 +147,7 @@ class AFNT:
     
         return 0
 
-    def concat_afn(self):
-        
-        return 0
+
 
     def drawGraph(self,afn):
         file_name = 'graphs-output/'+'test1'
