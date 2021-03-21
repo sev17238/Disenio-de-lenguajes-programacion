@@ -143,7 +143,7 @@ class AFNT:
         '''
         Funcion para operar | entre dos grafos cualesquiera. 
 
-        Esta funcion no recibe parametros ya que operara Or con dos grafos o 
+        Esta funcion no recibe parametros ya que operara Or entre dos grafos o 
         AFNs que se encuentren en el array global de afns (AFNArray).
         '''
         #El grafo que contendra el resultado
@@ -205,13 +205,64 @@ class AFNT:
         #agregamos el nodo final
         orGraph[counter] = f_node
 
-        #colocamos el grafo de resultado en el array de afns global
+        #colocamos el grafo OR de resultado en el array de afns global
         self.AFNArray.append(orGraph)
 
 
     def kleene_afn(self):
-    
-        return 0
+        '''
+        Funcion para operar * entre dos grafos cualesquiera. 
+
+        Esta funcion no recibe parametros ya que operara kleene entre dos grafos o 
+        AFNs que se encuentren en el array global de afns (AFNArray).
+        '''
+        #se crea el grafo que contendra la operacion kleene sobre el grafo en cuestion
+        kleeneGraph = {}
+        # contador para actualizacion de estados de los nodos
+        counter = 0
+
+        #creamos el nodo inicial del grafo kleene
+        i_node = NodeT(isInitial=True)
+        #grafo tomado del stack de afns global
+        graph1 = self.AFNArray.pop()
+        #agregamos nodo inicial
+        kleeneGraph[counter] = i_node
+        initCounterKleene = counter
+
+        # se actualizan los id de cada nodo
+        afnCounter1, newAFN1 = updateNodesId(counter,graph1)
+
+        # obtenemos el estado de los nodos inicial y final del grafo 1
+        id_inode_graph1, newAFN1 = getInitialNodeId(newAFN1)
+        id_fnode_graph1, newAFN1 = getAcceptingNodeId(newAFN1)
+        #agregamos este grafo al grafo kleene
+        kleeneGraph.update(newAFN1)
+
+        #creamos el nodo final del grafo kleene
+        f_node = NodeT(isAccepting=True)
+        counter = afnCounter1+1
+
+        kleeneGraph[counter] = f_node
+
+        #se procede a crear las 4 relaciones a travez de epsilon en un grafo kleene
+        #relacion entre el nodo inicial y el nodo final de kleene a travez de epsilon
+        rel_i_to_f = RelationT(initCounterKleene,'ε',counter)
+        kleeneGraph[initCounterKleene].addRelation(rel_i_to_f)
+        #relacion entre el nodo inicial de kleene y el grafo 1
+        rel_i_to_igraph1 = RelationT(initCounterKleene,'ε',id_inode_graph1)
+        kleeneGraph[initCounterKleene].addRelation(rel_i_to_igraph1)
+        #relacion entre el nodo final del grafo 1 y el nodo final de kleene
+        rel_fgraph1_to_f = RelationT(id_fnode_graph1,'ε',counter)
+        kleeneGraph[id_fnode_graph1].addRelation(rel_fgraph1_to_f)
+        #relacion entre el nodo final del grafo 1 y el nodo final de kleene
+        rel_fgraph1_to_igraph1 = RelationT(id_fnode_graph1,'ε',id_inode_graph1)
+        kleeneGraph[afnCounter1].addRelation(rel_fgraph1_to_igraph1)
+
+        #actualizamos el array de afns con el grafo kleene recien construido
+        self.AFNArray.append(kleeneGraph)
+
+
+
 
 
 
