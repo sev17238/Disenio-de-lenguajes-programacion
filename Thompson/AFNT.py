@@ -140,8 +140,74 @@ class AFNT:
         return 0
 
     def or_afn(self):
+        '''
+        Funcion para operar | entre dos grafos cualesquiera. 
 
-        return 0
+        Esta funcion no recibe parametros ya que operara Or con dos grafos o 
+        AFNs que se encuentren en el array global de afns (AFNArray).
+        '''
+        #El grafo que contendra el resultado
+        orGraph = {}
+        #Este contador actualiza los estados de los nodos
+        counter = -1
+
+        #obtenemos los grafos a concatenar
+        graph1 = self.AFNArray.pop()
+        graph2 = self.AFNArray.pop()
+
+
+        # Se crea el nodo inicial del grafo OR --------------------------
+        i_node = NodeT(isInitial=True)
+        #colocameos el nodo incial al principio del grafo de resultado or
+        orGraph[counter] = i_node
+
+        #                                       < Construccion y actualizacion de estados >
+
+        #Actualizamos estados del grafo 1
+        afnCounter1, newAFN1 = updateNodesId(counter,graph1)
+        #obtenemos nodos inicial y final del grafo 1
+        id_inode_graph1, newAFN1 = getInitialNodeId(newAFN1)
+        id_fnode_graph1, newAFN1 = getInitialNodeId(newAFN1)
+
+        #Actualizamos estados del grafo 2
+        afnCounter2, newAFN2 = updateNodesId(afnCounter1,graph2)
+        #obtenemos nodos inicial y final del grafo 2
+        id_inode_graph2, newAFN2 = getInitialNodeId(newAFN2)
+        id_fnode_graph2, newAFN2 = getAcceptingNodeId(newAFN2)
+
+        #Ingresamos los grafos actualizados al grafo que contendra el resultado de la operacion OR
+        orGraph.update(newAFN1)
+        orGraph.update(newAFN2)
+
+        #se crea el nodo final del grafo OR --------------------------------
+        f_node = NodeT(isAccepting=True)
+
+        # relacion del nodo inicial de OR hacia el nodo inicial del grafo 1 a travez de epsilon
+        i_node_rel_to_AFN1 = RelationT(counter,'ε',id_inode_graph1)
+        # relacion del nodo inicial de OR hacia el nodo inicial del grafo 2 a travez de epsilon
+        i_node_rel_to_AFN2 = RelationT(counter,'ε',id_inode_graph2)
+
+        #se agregan las relaciones al nodo inicial del grafo OR
+        orGraph[counter].addRelation(i_node_rel_to_AFN1)
+        orGraph[counter].addRelation(i_node_rel_to_AFN2)
+        counter = afnCounter2+1
+
+        # relacion del nodo inicial de OR hacia el nodo inicial del grafo 1
+        AFN1_to_f_node_OR = RelationT(id_fnode_graph1,'ε',counter)
+        # relacion del nodo inicial de OR hacia el nodo inicial del grafo 2
+        AFN2_to_f_node_OR = RelationT(id_fnode_graph2,'ε',counter)
+
+        #relacionamos el ultimo nodo del grafo 1 al ultimo nodo del grafo OR con epsilon
+        orGraph[afnCounter1].addRelation(AFN1_to_f_node_OR)
+        #relacionamos el ultimo nodo del grafo 2 al ultimo nodo del grafo OR con epsilon
+        orGraph[afnCounter2].addRelation(AFN2_to_f_node_OR)
+
+        #agregamos el nodo final
+        orGraph[counter] = f_node
+
+        #colocamos el grafo de resultado en el array de afns global
+        self.AFNArray.append(orGraph)
+
 
     def kleene_afn(self):
     
