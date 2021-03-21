@@ -42,8 +42,7 @@ class InfixRegexToPostfix:
         3: '.', # operador de concatenacion explicito
         4: '?',
         4: '*',
-        4: '+',
-        5: '^',
+        4: '+'
         }
 
     def get_key(self,character):
@@ -64,11 +63,11 @@ class InfixRegexToPostfix:
         Funcion que retorna la precedencia del operador ingresado.
 
         Parametros:
-        - character: un caracter o token 
+        - character: un caracter o token
         - return - la precedencia correspondiente
         '''
         precedence = self.get_key(character)
-        precedence = 6 if precedence == None else precedence
+        precedence = 5 if precedence == None else precedence
         return precedence
 
     def replace_case_with_equivalent(self,regex,t=0):
@@ -175,8 +174,8 @@ class InfixRegexToPostfix:
             - regex: una cadena (expresion regular)
         '''
         res = ''
-        allOperators = ['|','?','+','*','^']
-        binaryOperators = ['^','|']
+        allOperators = ['|','?','+','*']
+        binaryOperators = ['|']
 
         for i in range(0,len(regex)):
             c1 = regex[i]
@@ -200,11 +199,14 @@ class InfixRegexToPostfix:
 
         postfix = ''
         stack = []
-        eqRegex = self.replace_cases_with_equivalents(regex)
-        formattedRegex = self.format_reg_ex(eqRegex)
+        #eqRegex = self.replace_cases_with_equivalents(regex)
+        #formattedRegex = self.format_reg_ex(eqRegex)
 
-        for cc in range(len(formattedRegex)):
-            c = formattedRegex[cc]
+        formattedRegex = self.format_reg_ex(regex)
+        eqRegex = self.replace_cases_with_equivalents(formattedRegex)
+
+        for cc in range(len(eqRegex)):
+            c = eqRegex[cc]
             if (c == '('):
                 stack.append(c)
             elif(c == ')'):
@@ -234,8 +236,9 @@ class InfixRegexToPostfix:
         if(postfix.find('(') != -1):
             postfix = 'ERROR_POSTFIX_)'
 
-        print(' - infix     = '+regex)
-        print(' - infixEq   = '+eqRegex)
+        print(' - infix       = '+regex)
+        print(' - dottedEq    = '+formattedRegex)
+        print(' - substEq     = '+eqRegex)
         #print('postfix   = '+postfix)
         return postfix.replace('..','.')
 
@@ -262,12 +265,12 @@ def main():
     print(obj.infix_to_postfix('(a|b)*a(a|b)(a|b)'))'''
 
     #E. R. CORRECTAS
-    '''print('EXPRESIONES REGULARES CORRECTAS ----')
+    print('EXPRESIONES REGULARES CORRECTAS ----')
     print(obj.infix_to_postfix('((1?)*)*'))
     print(obj.infix_to_postfix('(a|ε)b(a+)c?'))
     print(obj.infix_to_postfix('(1|0)+001'))
     print(obj.infix_to_postfix('(εa|εb)*abb'))
-    '''
+
 
     #E. R. Incorrectas (manejo de errores)
     #rint('EXPRESIONES REGULARES INCORRECTAS ----')
