@@ -35,13 +35,13 @@ def menu():
 def userInteraction():
     expresion = input('Ingrese una expresion regular: ')
     expresion = expresion.replace(' ','')
-    cadena = input('Ingrese la cadena a evaluar: ')
-    cadena = expresion.replace(' ','')
+    chain = input('Ingrese la cadena a evaluar: ')
+    chain = expresion.replace(' ','')
 
     obj = InfixRegexToPostfix()
     postfix = obj.infix_to_postfix(expresion)
 
-    return postfix, cadena
+    return postfix, chain
 
 
 # Executions ________________________
@@ -51,12 +51,12 @@ welcome()
 while True:
 
     menu()
-    opcion = input('Ingrese una opacion: ')
+    option = input('Ingrese una opacion: ')
 
-    if(opcion == '1'):
-        cadena = ''
+    if(option == '1'):
+        chain = ''
 
-        postfixRegex,cadena = userInteraction()
+        postfixRegex,chain = userInteraction()
         if(postfixRegex == 'ERROR_POSTFIX_)'):
             print('\n ")" faltante en la expresion regular ingresada. Vuelva a intentar. \n')
         else:
@@ -67,15 +67,15 @@ while True:
             print(' - alfabeto (tokens): '+str(tokens))
             #print(str(postfixRegex))
 
-            '''objafn = AFNT(tokens,cadena)
+            '''objafn = AFNT(tokens,chain)
             AFN = objafn.generateAFN(postfixRegex)
 
-            objafd = AFDS(tokens,cadena,AFN)
+            objafd = AFDS(tokens,chain,AFN)
             AFD = objafd.generateAFDFromAFN()'''
 
-    elif(opcion == '2'):
+    elif(option == '2'):
         # Pruebas de funcionalidad
-        postfixRegex,cadena = userInteraction()
+        postfixRegex,chain = userInteraction()
         if(postfixRegex == 'ERROR_POSTFIX_)'):
             print('\n ")" faltante en la expresion regular ingresada. Vuelva a intentar. \n')
         else:
@@ -86,10 +86,10 @@ while True:
             print(tokens)
             print(postfixRegex)
 
-            '''objdirect = AFDD(tokens,cadena,postfixRegex)
+            '''objdirect = AFDD(tokens,chain,postfixRegex)
             AFD = objdirect.generateDirectAFD()'''
 
-    elif(opcion == '3'):
+    elif(option == '3'):
         print('\nAdios! ')
         break
     else:
