@@ -15,7 +15,7 @@ from graphs.Node import Node
 
 class GraphGUI:
     '''
-    Clase para construir un grafo y dibujarlo
+    Clase para dibujar un grafo.
 
     Atributos:
      - name = nombre del grafo
@@ -32,7 +32,7 @@ class GraphGUI:
         dot = Digraph(comment='Test 1',filename=file_name,format='png', engine='sfdp')
         dot.attr(size='8,5')
         dot.attr('node', shape='circle')
-        dot.attr('node',style='filled',color='lightgrey')
+        dot.attr('node',style='filled',color='lightblue') #,color='lightgrey'
 
         nodes = self.nodes
         for i in nodes:

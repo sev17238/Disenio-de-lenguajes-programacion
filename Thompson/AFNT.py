@@ -77,7 +77,7 @@ class AFNT:
         file_name = 'thompson-graphs/'+filename
         dot = Digraph(comment=filename, format='png')
         dot.attr(rankdir='LR', size='8,8')
-        dot.attr('node', style='filled', color='lightgrey')
+        dot.attr('node', style='filled',color='lightblue') #,color='lightgrey'
 
         acceptingState = getAcceptingStates(resultAFN)
         dot.attr('node', shape='doublecircle')
