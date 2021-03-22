@@ -11,20 +11,20 @@
 ######################################################
 
 #Descripcion de algoritmo______________________________________________
-'''
-A simple conversion, Shunting-yard algorithm
-    1. Input: 3 + 4
-    2. Push 3 to the output queue (whenever a number is read it is pushed to the output)
-    3. Push + (or its ID) onto the operator stack
-    4. Push 4 to the output queue
-    5. After reading the expression, pop the operators off the stack and add them to the output.
-       In this case there is only one, "+".
-    6. Output: 3 4 +
 
-This already shows a couple of rules:
-    All numbers are pushed to the output when they are read.
-    At the end of reading the expression, pop all operators off the stack and onto the output.
-'''
+#A simple conversion, Shunting-yard algorithm
+#    1. Input: 3 + 4
+#    2. Push 3 to the output queue (whenever a number is read it is pushed to the output)
+#    3. Push + (or its ID) onto the operator stack
+#    4. Push 4 to the output queue
+#    5. After reading the expression, pop the operators off the stack and add them to the output.
+#       In this case there is only one, "+".
+#    6. Output: 3 4 +
+#
+#This already shows a couple of rules:
+#    All numbers are pushed to the output when they are read.
+#    At the end of reading the expression, pop all operators off the stack and onto the output.
+
 
 #Clase de implementacion_________________________________________________
 class InfixRegexToPostfix:
@@ -247,7 +247,8 @@ def main():
     obj = InfixRegexToPostfix()
     
     #PRUEBAS
-    '''print(obj.infix_to_postfix('(a*|b*)c'))
+    '''
+    print(obj.infix_to_postfix('(a*|b*)c'))
     print(obj.infix_to_postfix('(b|b)*abb(a|b)*'))
     print(obj.infix_to_postfix('(a|ε)b(a+)c?'))
     print(obj.infix_to_postfix('(a|b)*a(a|b)(a|b)'))
@@ -262,19 +263,23 @@ def main():
     print(obj.infix_to_postfix('0?(1|ε)?0*'))
     print(obj.infix_to_postfix('((1?)*)*'))
     print(obj.infix_to_postfix('(01)*(10)*'))
-    print(obj.infix_to_postfix('(a|b)*a(a|b)(a|b)'))'''
+    print(obj.infix_to_postfix('(a|b)*a(a|b)(a|b)'))
+    '''
 
     #E. R. CORRECTAS
+    '''
     print('EXPRESIONES REGULARES CORRECTAS ----')
     print(obj.infix_to_postfix('((1?)*)*'))
     print(obj.infix_to_postfix('(a|ε)b(a+)c?'))
     print(obj.infix_to_postfix('(1|0)+001'))
     print(obj.infix_to_postfix('(εa|εb)*abb'))
+    '''
 
 
     #E. R. Incorrectas (manejo de errores)
     #rint('EXPRESIONES REGULARES INCORRECTAS ----')
-    '''print(obj.infix_to_postfix('(a|b)*a(a|b)(a|b)+'))
+    '''
+    print(obj.infix_to_postfix('(a|b)*a(a|b)(a|b)+'))
     print(obj.infix_to_postfix('(a|b*a(a|b)(a|b)+'))
     print(obj.infix_to_postfix('((1?)*)*'))
     print(obj.infix_to_postfix('(1?)*)*'))

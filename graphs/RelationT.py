@@ -31,9 +31,14 @@ class RelationT:
         return self.destiny
 
     def getRelationAttributes(self):
-        return self.origin, self.token, self.destiny
+        return [self.origin, self.token, self.destiny]
 
     #others
     def updateRelation(self,dictionary):
+        '''
+        Funcion que actualiza el estado viejo de la relacion en base a los 
+        valores diccionario de entrada.
+        '''
         self.origin = dictionary[self.origin]
         self.destiny = dictionary[self.destiny]
+        return 0

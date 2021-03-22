@@ -11,10 +11,10 @@ import collections
 from functions import *
 from graphs.NodeT import *
 from graphs.RelationT import RelationT
+from graphs.GraphGUI import GraphGUI
 import sys
 sys.path.append(".")
 from graphviz import Digraph
-
 
 class AFNT:
     '''
@@ -26,8 +26,6 @@ class AFNT:
         #self.funciones = functions()
         self.stack = []
         self.top = -1
-
-        # graphviz
 
         self.initNode = 0
         self.acceptNode = 0
@@ -49,11 +47,15 @@ class AFNT:
         self.top += 1
         self.stack.append(i)
 
-    def postFixParser(self,expresion):
+    def postFixParser(self, expresion):
+        '''
+        Funcion para recorrer la cadena postfix e interpretar
+        cada uno de los tokens y operandos
+        '''
         for i in expresion:
             # si el iterador es un token
             if(i in "".join(self.alphabet)):
-                self.token_afn()
+                self.token_afn(i)
             # si el iterador apunta a un operador
             elif(i in ".|*"):
                 if(i == "."):
@@ -64,17 +66,51 @@ class AFNT:
                     self.kleene_afn()
 
         afnArrEnd = self.AFNArray.pop()
-        self.AFNSim(afnArrEnd)
+        #self.AFNSim(afnArrEnd)
         self.drawGraph(afnArrEnd)
+
         return afnArrEnd
 
-    def token_afn(self,a):
+
+    def drawGraph(self, AFN, filename='thompson-afn'):
+        resultAFN = AFN
+        file_name = 'thompson-graphs/'+filename
+        dot = Digraph(comment=filename, format='png')
+        dot.attr(rankdir='LR', size='8,8')
+        dot.attr('node', style='filled', color='lightgrey')
+
+        acceptingState = getAcceptingStates(resultAFN)
+        dot.attr('node', shape='doublecircle')
+        dot.node(str(acceptingState[0]))
+
+        dot.attr('node', shape='circle')
+        initState = getInitialStates(resultAFN)
+
+        afnRelations = getAFNRelations(resultAFN)
+
+        for rels in afnRelations:
+            if(len(rels) > 0):
+                if(len(rels) > 1):
+                    for rel in rels:
+                        dot.edge(str(rel.getOrigin()), str(
+                            rel.getDestiny()), label=str(rel.getToken()))
+                else:
+                    rel = rels.pop()
+                    dot.edge(str(rel.getOrigin()), str(
+                        rel.getDestiny()), label=str(rel.getToken()))
+
+        dot.attr(label=r'\n'+filename, fontsize='20')
+        dot.render(filename=file_name, view=True)
+        #dot.view()
+
+
+    def token_afn(self,token):
         '''
         Funcion para generar el par de nodos correspondientes.
-        Ej. (Ni) --a--> (Nf)
+        Ej. (Ni) --token--> (Nf)
 
         Parametros:
-        - a - token cualquiera del alfabeto en cuestion que servira como transicion entre ambos nodos
+        - token - token cualquiera del alfabeto en cuestion que servira como transicion entre ambos nodos
         - return - un grafo pequeño compuesto por dos nodos
         '''
         #se crea un grafo local
@@ -86,9 +122,10 @@ class AFNT:
         node2 = NodeT(isAccepting=True)
 
         # Relacion: origen ---a---> Destino
-        relation = RelationT(counter,a,counter+1)
+        relation = RelationT(counter,token,counter+1)
         node1.addRelation(relation)
 
+        #node2.clearRelations()
         #estos nodos se agregan al grafo local
         localGraph[counter] = node1
         localGraph[counter+1] = node2
@@ -115,8 +152,8 @@ class AFNT:
         counter = -1
 
         #obtenemos los grafos a concatenar
-        graph1 = self.AFNArray.pop()
         graph2 = self.AFNArray.pop()
+        graph1 = self.AFNArray.pop()
 
         #Se actualizan los estados de cada nodo del grafo1
         afnCounter1, newAFN1 = updateNodesId(counter,graph1)
@@ -127,7 +164,7 @@ class AFNT:
         
         #actualizamos los estados del afn2
         afnCounter2, newAFN2 = updateNodesId(afnCounter1-1,graph2)
-        id_fnode_graph2, newAFN2 = getInitialNodeId(newAFN2)
+        id_inode_graph2, newAFN2 = getInitialNodeId(newAFN2)
 
         counter = afnCounter2
 
@@ -139,6 +176,7 @@ class AFNT:
 
         return 0
 
+
     def or_afn(self):
         '''
         Funcion para operar | entre dos grafos cualesquiera. 
@@ -149,25 +187,25 @@ class AFNT:
         #El grafo que contendra el resultado
         orGraph = {}
         #Este contador actualiza los estados de los nodos
-        counter = -1
+        counter = 0
 
-        #obtenemos los grafos a concatenar
-        graph1 = self.AFNArray.pop()
-        graph2 = self.AFNArray.pop()
-
-
+        
         # Se crea el nodo inicial del grafo OR --------------------------
         i_node = NodeT(isInitial=True)
+        #obtenemos los grafos a concatenar
+        graph2 = self.AFNArray.pop()
+        graph1 = self.AFNArray.pop()
+
         #colocameos el nodo incial al principio del grafo de resultado or
         orGraph[counter] = i_node
 
-        #                                       < Construccion y actualizacion de estados >
+        #-------------------------------< Construccion y actualizacion de estados >-------------------------------------
 
         #Actualizamos estados del grafo 1
         afnCounter1, newAFN1 = updateNodesId(counter,graph1)
         #obtenemos nodos inicial y final del grafo 1
         id_inode_graph1, newAFN1 = getInitialNodeId(newAFN1)
-        id_fnode_graph1, newAFN1 = getInitialNodeId(newAFN1)
+        id_fnode_graph1, newAFN1 = getAcceptingNodeId(newAFN1)
 
         #Actualizamos estados del grafo 2
         afnCounter2, newAFN2 = updateNodesId(afnCounter1,graph2)
@@ -207,6 +245,8 @@ class AFNT:
 
         #colocamos el grafo OR de resultado en el array de afns global
         self.AFNArray.append(orGraph)
+
+        return 0
 
 
     def kleene_afn(self):
@@ -261,43 +301,14 @@ class AFNT:
         #actualizamos el array de afns con el grafo kleene recien construido
         self.AFNArray.append(kleeneGraph)
 
+        return 0
+
+
+    def generateAFN(self,postFixRegex):
+        print('afn is constructing...')
+        resultAFN = self.postFixParser(postFixRegex)
+
+        return resultAFN
 
 
 
-
-
-    def drawGraph(self,afn):
-        file_name = 'graphs-output/'+'test1'
-        dot = Digraph(comment='Test 1',filename=file_name,format='png', engine='sfdp')
-        dot.attr(size='8,5')
-        dot.attr('node', shape='circle')
-        dot.attr('node',style='filled',color='lightgrey')
-
-        nodes = afn
-        for i in nodes:
-            node = nodes.get(i)
-            print(node.getIsAccepting())
-            print(node.getRelations())
-            if(node.getIsAccepting()):
-                dot.attr('node', shape='doublecircle')
-                val = str(list(nodes.keys())[i])
-            else:
-                val = str(list(nodes.keys())[i])
-            dot.node(val, val)
-            if(len(node.getRelations()) > 1):
-                for e in range(len(node.getRelations())):
-                    rel = node.getSpecificRelation(e)
-                    dot.edge(val, rel.getDestiny(),label=rel.getToken())
-            elif(len(node.getRelations()) == 1):
-                rel = node.getSpecificRelation(0)
-                print('origin,token,destiny')
-                print(rel.getOrigin(),rel.getToken(),rel.getDestiny())
-                dot.edge(val, rel.getDestiny(),label=rel.getToken())
-
-        dot.attr(label=r'\n'+self.name,fontsize='10')
-        #dot.unflatten(stagger=3)
-        # dot.render('test-output/test3.gv', view=True)
-        dot.render(view=True)
-        #dot.view()
-
-    

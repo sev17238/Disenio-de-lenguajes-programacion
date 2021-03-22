@@ -13,7 +13,7 @@ import os
 import sys
 sys.path.append(".")
 from InfixPostfixRelated.InfixRegexToPostfix import InfixRegexToPostfix
-
+from Thompson.AFNT import AFNT
 from functions import *
 import collections
 
@@ -51,7 +51,7 @@ welcome()
 while True:
 
     menu()
-    option = input('Ingrese una opacion: ')
+    option = input('Ingrese una opcion: ')
 
     if(option == '1'):
         chain = ''
@@ -67,9 +67,11 @@ while True:
             print(' - alfabeto (tokens): '+str(tokens))
             #print(str(postfixRegex))
 
-            '''objafn = AFNT(tokens,chain)
+            objafn = AFNT(tokens,chain)
             AFN = objafn.generateAFN(postfixRegex)
 
+            print(AFN)
+            '''
             objafd = AFDS(tokens,chain,AFN)
             AFD = objafd.generateAFDFromAFN()'''
 

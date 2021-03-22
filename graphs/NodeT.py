@@ -15,8 +15,8 @@ class NodeT:
      - isInitial = es inicial
      - isAccepting = es final o de aceptacion
     '''
-    def __init__(self,relations=[],isInitial=False,isAccepting=False):
-        self.relations = relations
+    def __init__(self,isInitial=False,isAccepting=False):
+        self.relations = []
         self.isInitial = isInitial
         self.isAccepting = isAccepting
 
@@ -49,10 +49,17 @@ class NodeT:
 
 
     #others_______________
+    def clearRelations(self):
+        self.relations = []
+
     def addRelation(self,relation):
         self.relations.append(relation)
 
     def updateRelations(self,updatedDict):
+        '''
+        Funcion que actualiza las relaciones de cada nodo en base a un diccionario con los
+        estados actualizados.
+        '''
         for rel in self.relations:
             rel.updateRelation(updatedDict)
 
@@ -106,7 +113,8 @@ def getInitialStates(AFN):
 
 def updateNodesId(statesCounter,AFN):
     '''
-    Se actualizan las relaciones antiguas del AFN en cuestion.
+    Funcion que centraliza las actualizaciones de los estados de los nodos en primer lugar y luego
+    las actualizacion de las relaciones de cada nodo.
     '''
     updatedAFN = {}
     oldRelationsId = {}
@@ -138,7 +146,7 @@ def getAcceptingNodeId(AFN):
     Devuelve el id del nodo de aceptacion o final de un afn cualquiera
     '''
     for id, node in AFN.items():
-        if(node.getIsAccepting):
+        if(node.getIsAccepting()):
             node.clearStates()
             return id, AFN
 
