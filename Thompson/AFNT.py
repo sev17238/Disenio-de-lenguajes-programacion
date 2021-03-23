@@ -11,7 +11,6 @@ import collections
 from functions import *
 from graphs.NodeT import *
 from graphs.RelationT import RelationT
-from graphs.GraphGUI import GraphGUI
 import sys
 sys.path.append(".")
 from graphviz import Digraph
@@ -23,10 +22,8 @@ class AFNT:
 
     def __init__(self, tokens, chain):
         self.initString = ''
-        #self.funciones = functions()
         self.stack = []
         self.top = -1
-
         self.initNode = 0
         self.acceptNode = 0
         self.currentNode = 1
@@ -92,12 +89,10 @@ class AFNT:
             if(len(rels) > 0):
                 if(len(rels) > 1):
                     for rel in rels:
-                        dot.edge(str(rel.getOrigin()), str(
-                            rel.getDestiny()), label=str(rel.getToken()))
+                        dot.edge(str(rel.getOrigin()), str(rel.getDestiny()), label=str(rel.getToken()))
                 else:
                     rel = rels.pop()
-                    dot.edge(str(rel.getOrigin()), str(
-                        rel.getDestiny()), label=str(rel.getToken()))
+                    dot.edge(str(rel.getOrigin()), str(rel.getDestiny()), label=str(rel.getToken()))
 
         dot.attr(label=r'\n'+filename, fontsize='20')
         dot.render(filename=file_name, view=True)

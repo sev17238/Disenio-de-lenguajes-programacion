@@ -135,6 +135,7 @@ ref/
 tests/
 
 thompson-graphs/
+subsets-graphs/
 
 *tests.py
 *test.py

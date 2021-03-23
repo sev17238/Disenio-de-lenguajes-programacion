@@ -12,8 +12,9 @@
 import os
 import sys
 sys.path.append(".")
-from InfixPostfixRelated.InfixRegexToPostfix import InfixRegexToPostfix
-from Thompson.AFNT import AFNT
+from infix_postfix_related.InfixRegexToPostfix import InfixRegexToPostfix
+from thompson.AFNT import AFNT
+from subsets.Subsets import Subsets
 from functions import *
 import collections
 
@@ -67,13 +68,13 @@ while True:
             print(' - alfabeto (tokens): '+str(tokens))
             #print(str(postfixRegex))
 
-            objafn = AFNT(tokens,chain)
-            AFN = objafn.generateAFN(postfixRegex)
+            obj_afn = AFNT(tokens,chain)
+            AFN = obj_afn.generateAFN(postfixRegex)
 
             print(AFN)
-            '''
-            objafd = AFDS(tokens,chain,AFN)
-            AFD = objafd.generateAFDFromAFN()'''
+            
+            obj_afd = Subsets(tokens,chain,AFN)
+            AFD = obj_afd.afn_to_afd_process()
 
     elif(option == '2'):
         # Pruebas de funcionalidad
