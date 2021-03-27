@@ -145,7 +145,7 @@ class Subsets:
         if(s == F):
             print('-------------------------------------------------')
             print('La cadena '+self.chain+' fue aceptada por el AFD.')
-            end_time = time.perf_counter()
+            end_time = time.perf_counter() 
             total_time = end_time-start_time
             print('Tiempo transcurrido: '+str(total_time))
             print('-------------------------------------------------')

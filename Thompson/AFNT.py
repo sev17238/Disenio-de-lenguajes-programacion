@@ -330,7 +330,7 @@ class AFNT:
         - AFN: diccionario que representacion del AFN en question
         - statesSet: Un conjunto de estados de un AFN Ej. A = [0,1,2,4,7]
         - transition: transicion por la que pueden pasar algunos de los estados en A.
-        - return - [3,8]
+        - return - [3,8] 
         '''
         resultSet = []
         for state in statesSet:
