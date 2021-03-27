@@ -37,7 +37,7 @@ def userInteraction():
     expresion = input('Ingrese una expresion regular: ')
     expresion = expresion.replace(' ','')
     chain = input('Ingrese la cadena a evaluar: ')
-    chain = expresion.replace(' ','')
+    chain = chain.replace(' ','')
 
     obj = InfixRegexToPostfix()
     postfix = obj.infix_to_postfix(expresion)
@@ -70,8 +70,6 @@ while True:
 
             obj_afn = AFNT(tokens,chain)
             AFN = obj_afn.generateAFN(postfixRegex)
-
-            print(AFN)
             
             obj_afd = Subsets(tokens,chain,AFN)
             AFD = obj_afd.afn_to_afd_process()

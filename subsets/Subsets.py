@@ -117,23 +117,69 @@ class Subsets:
         resultStateSet.sort()
         return resultStateSet
 
+    def moveAFD(self,statesSet,transition):
+        '''
+        Funcion mover() que retorna los estados (del conjunto de estados proporcionado), que pasan 
+        por la transicion especificada. Ej. move(A,a) --> (a|b)*abb
 
-    def simAFD(self,):
+        Params:
+        - AFD: diccionario que representacion del AFD en question
+        - statesSet: Un conjunto de estados de un AFN Ej. A = [0,1,2,4,7]
+        - transition: transicion por la que pueden pasar algunos de los estados en A.
+        - return - [3,8]
         '''
-        In process
+        resultSetArray = []
+        statesToTest = self.getTestingStates()
+
+        for stateFromSet in statesSet:
+            for state, dict_ in self.resultAFD.items():
+                for tran, s_set in dict_.items():
+                    if(state == stateFromSet and tran == transition):
+                        for id, state_val in statesToTest.items():
+                            if(s_set == state_val):
+                                resultSetArray.append(id)
+
+        return resultSetArray
+
+    def simAFD(self):
         '''
+        Funcion para simular un AFD 
+        '''
+        print('\n Simulando AFD con la cadena a evaluar... ')
+        F = self.getAFDAcceptingStates()
+        s = [0]
+        for token in self.chain:
+            s = self.moveAFD(s,token)
+
+        if(s == F):
+            print('-------------------------------------------------')
+            print('La cadena '+self.chain+' fue aceptada por el AFD.')
+            print('-------------------------------------------------')
+        else:
+            print('-------------------------------------------------')
+            print('La cadena '+self.chain+' NO fue aceptada por el AFD.')
+            print('-------------------------------------------------')
         return 0
 
     def afn_to_afd_process(self):
         self.build_afd(self.AFDStates)
-        #self.simAFD()
+        self.simAFD()
         self.drawAFD()
 
 
     def getAFDAcceptingStates(self):
+        '''
+        Se verifica si el estado de aceptacion del AFN se encuentra en alguno de los
+        sets de estados generados y asi saber que estado del AFD es de aceptacion.
+
+        - Ej. acceptingStatesAFN = 10 --> (a|b)*abb
+        '''
+        #los estaods de aceptacion del AFD
         acceptingStates = []
+        #Los Estados de aceptacion el AFN generado por thompson
         acceptingStatesAFN = getAcceptingStates(self.TAFN)[0]
         for state, values in self.resultAFD.items():
+            #si el estado del AFN se encuentra en el set de estados en cuestion
             if(acceptingStatesAFN in values[0]):
                 acceptingStates.append(state)
         return acceptingStates
@@ -149,6 +195,7 @@ class Subsets:
         return dict_
 
     def drawAFD(self, filename='subsets-afd'):
+        print('\nDibujando representacion del AFD...\n')
         file_name = 'subsets-graphs/'+filename
         dot = Digraph(comment=filename, format='png')
         dot.attr(rankdir='LR', size='8,8')
