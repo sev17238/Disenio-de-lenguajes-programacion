@@ -21,13 +21,6 @@ class AFNT:
     '''
 
     def __init__(self, tokens, chain):
-        self.initString = ''
-        self.stack = []
-        self.top = -1
-        self.initNode = 0
-        self.acceptNode = 0
-        self.currentNode = 1
-
         self.AFNArray = []
         self.AFNResult = {}
         self.chain = chain
@@ -61,7 +54,7 @@ class AFNT:
     def drawGraph(self, AFN, filename='thompson-afn'):
         print('Dibujando representacion del AFN... \n')
         resultAFN = AFN
-        file_name = 'thompson-graphs/'+filename
+        file_name = 'graphs-thompson/'+filename
         dot = Digraph(comment=filename, format='png')
         dot.attr(rankdir='LR', size='8,8')
         dot.attr('node', style='filled',color='lightblue') #,color='lightgrey'
@@ -117,10 +110,6 @@ class AFNT:
 
         #colocamos este grafo local en el AFN global
         self.AFNArray.append(localGraph)
-
-        self.acceptNode = self.currentNode
-        #Se suma 2 al valor del nodo en cuestion ya que se agregaron 2 nodos
-        self.currentNode += 2
 
     def concat_afn(self):
         '''

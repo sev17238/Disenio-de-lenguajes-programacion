@@ -27,12 +27,9 @@ class Subsets:
         self.alphabet.sort()
 
         self.TAFN = AFN
-        self.TAFNArray = []
-        self.TAFNStates = {}
 
         self.statesCounter = 0 
 
-        self.AFDArray = []
         self.resultAFD = {}
         self.AFDStates = []
 
@@ -193,7 +190,7 @@ class Subsets:
 
     def drawAFD(self, filename='subsets-afd'):
         print('Dibujando representacion del AFD...\n')
-        file_name = 'subsets-graphs/'+filename
+        file_name = 'graphs-subsets/'+filename
         dot = Digraph(comment=filename, format='png')
         dot.attr(rankdir='LR', size='8,8')
         dot.attr('node', style='filled',color='lightpink') #,color='lightgrey'
