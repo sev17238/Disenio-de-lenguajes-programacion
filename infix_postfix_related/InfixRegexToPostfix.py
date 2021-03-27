@@ -236,6 +236,7 @@ class InfixRegexToPostfix:
         if(postfix.find('(') != -1):
             postfix = 'ERROR_POSTFIX_)'
 
+        print('')
         print(' - infix       = '+regex)
         print(' - dottedEq    = '+formattedRegex)
         print(' - substEq     = '+eqRegex)

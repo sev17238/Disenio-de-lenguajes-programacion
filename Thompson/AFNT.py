@@ -33,17 +33,6 @@ class AFNT:
         self.chain = chain
         self.alphabet = tokens
 
-    def pop(self):
-        if (self.pop == -1):
-            return
-        else:
-            self.top -= 1
-            return self.stack.pop()
-
-    def push(self, i):
-        self.top += 1
-        self.stack.append(i)
-
     def postFixParser(self, expresion):
         '''
         Funcion para recorrer la cadena postfix e interpretar
@@ -62,14 +51,15 @@ class AFNT:
                 elif(i == "*"):
                     self.kleene_afn()
 
-        afnArrEnd = self.AFNArray.pop()
-        #self.AFNSim(afnArrEnd)
-        self.drawGraph(afnArrEnd)
+        endAFN = self.AFNArray.pop()
+        self.simAFN(endAFN)
+        self.drawGraph(endAFN)
 
-        return afnArrEnd
+        return endAFN
 
 
     def drawGraph(self, AFN, filename='thompson-afn'):
+        print('Dibujando representacion del AFN... \n')
         resultAFN = AFN
         file_name = 'thompson-graphs/'+filename
         dot = Digraph(comment=filename, format='png')
@@ -299,8 +289,109 @@ class AFNT:
         return 0
 
 
+    def simAFN(self,AFN):
+        '''
+        Funcion que simula un AFN recorriendo la cadena a evaluar ingresada.
+        '''
+        print('\nSimulando AFN con cadena de prueba... ')
+        
+        start_time = time.perf_counter()
+        s0 = getInitialStates(AFN)
+        F = getAcceptingStates(AFN)
+
+        S = self.e_clossure(AFN,[0])
+        for token in self.chain:
+            move = self.move(AFN,S,token)
+            S = self.e_clossure(AFN,move)
+
+        for state in F:
+            if(state in S):
+                print('-------------------------------------------------')
+                print('La cadena '+self.chain+' fue aceptada por el AFN.')
+                end_time = time.perf_counter()
+                total_time = end_time-start_time
+                print('Tiempo transcurrido: '+str(total_time))
+                print('-------------------------------------------------')
+            else:
+                print('-------------------------------------------------')
+                print('La cadena '+self.chain+' NO fue aceptada por el AFN.')
+                end_time = time.perf_counter()
+                total_time = end_time-start_time
+                print('Tiempo transcurrido: '+str(total_time))
+                print('-------------------------------------------------')
+                
+
+    def move(self, AFN, statesSet, transition):
+        '''
+        Funcion mover() que retorna los estados (del conjunto de estados proporcionado), que pasan
+        por la transicion especificada. Ej. move(A,a) --> (a|b)*abb
+
+        Params:
+        - AFN: diccionario que representacion del AFN en question
+        - statesSet: Un conjunto de estados de un AFN Ej. A = [0,1,2,4,7]
+        - transition: transicion por la que pueden pasar algunos de los estados en A.
+        - return - [3,8]
+        '''
+        resultSet = []
+        for state in statesSet:
+            for node in AFN.values():
+                rels = node.getRelations()
+                if(len(rels) > 0):
+                    for rel in rels:
+                        # Si el estado es igual al origen del nodo(relacion) en cuestion y el token es igual que la 
+                        # transicion se agregara el destino a resultSet 
+                        if(state == rel.getOrigin() and rel.getToken() == transition):
+                            # Eliminacion de duplicados
+                            resultSet = list(dict.fromkeys(resultSet))
+                            # Los estados se ordenan de forma ascendente
+                            resultSet.sort()
+                            # Este sera el estado al que podemos llegar a travez de la 
+                            # transicion especificada.
+                            resultSet.append(rel.getDestiny())
+
+        # Eliminacion de duplicados
+        resultSet = list(dict.fromkeys(resultSet))
+        resultSet.sort()
+        return resultSet
+
+    def e_clossure(self,AFN,move):
+        '''
+        Funcion de cerradura epsilon que retorna todos los estados a los que se 
+        puede llegar en el AFN a travez de epsilon o un token cualquiera. 
+        Ej. ε_closure(AFN,[3,8]) --> (a|b)*abb
+
+        Params:
+        - AFN: diccionario con el AFN en question
+        - move: Resultado proporcionado por la funcion mover()
+        - return - Dtran(A,a) = ε_closure(move(A,a)) = [1,2,3,4,6,7,8]
+        '''
+        resultStateSet = []
+        resultStateSet += move
+        for state in move:
+            for node in AFN.values():
+                rels = node.getRelations()
+                if(len(rels) > 1):
+                    for rel in rels:
+                        if(state == rel.getOrigin() and rel.getToken() == 'ε'):
+                            # Eliminacion de duplicados
+                            resultStateSet = list(dict.fromkeys(resultStateSet))
+                            # Ordenamiento en orden ascendente
+                            resultStateSet.sort()
+                            resultStateSet += self.e_clossure(AFN,[rel.getDestiny()])
+                elif(len(rels) != 0):
+                    if(state == rels[0].getOrigin() and rels[0].getToken() == 'ε'):
+                        resultStateSet = list(dict.fromkeys(resultStateSet))
+                        resultStateSet.sort()
+                        resultStateSet += self.e_clossure(AFN,[rels[0].getDestiny()])
+
+        # Eliminacion de duplicados
+        resultStateSet = list(dict.fromkeys(resultStateSet))
+        # Ordenamiento en orden ascendentes
+        resultStateSet.sort()
+        return resultStateSet
+
+
     def generateAFN(self,postFixRegex):
-        print('afn is constructing...')
         resultAFN = self.postFixParser(postFixRegex)
 
         return resultAFN
