@@ -176,6 +176,8 @@ class DirectAFD:
                 return c1.getFirstPos()'''
 
     def buildNextPos(self):
+        """Funcion para la construccion de nextpos a partir del arbol con los annullable, firstpos y lastpos
+        """
         tree = self.firstLastPos
         localStateCounter = 0
         for id, node in tree.items():
@@ -189,7 +191,7 @@ class DirectAFD:
                         self.nextPos[state] = self.nextPos[state] + c2.getFirstPos()
                     else:
                         self.nextPos[state] = c2.getFirstPos()
-            
+
             elif(node.getToken() == '*'):
                 for state in node.getLastPos():
                     if(state in self.nextPos):
@@ -199,10 +201,32 @@ class DirectAFD:
                         localStateCounter += 1
 
         self.nextPos[len(self.nextPos)+1] = []
+
+        tokensInPostfix = []
+        for token in self.postfix_regex:
+            if(token in "".join(self.alphabet)):
+                tokensInPostfix.append(token)
+
+        counter = 1
+        for token in tokensInPostfix:
+            self.nextPos[counter] = [token,self.nextPos[counter]]
+            counter += 1
+        self.nextPos[counter] = ['#',self.nextPos[counter]]
         print(self.nextPos)
 
-    def generateDirectAFD(self):
+        self.globalCounter = 0
 
+    def nextPosToAFD(self):
+        
+
+
+        return  0
+
+    def generateDirectAFD(self):
+        """Funcion centralizadora de las funciones necesarias para la generacion de un AFD a partir de una
+        expresion regular.
+        """
         self.posfixParse()
         self.buildNextPos()
+        self.nextPosToAFD()
 
