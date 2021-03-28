@@ -15,6 +15,7 @@ sys.path.append(".")
 from infix_postfix_related.InfixRegexToPostfix import InfixRegexToPostfix
 from thompson.AFNT import AFNT
 from subsets.Subsets import Subsets
+from direct.DirectAFD import DirectAFD
 from functions import *
 import collections
 
@@ -84,11 +85,11 @@ while True:
             tokens = getRegExUniqueTokens(postfixRegex)
             postfixRegex = stringToArray(postfixRegex)
 
-            print(tokens)
-            print(postfixRegex)
+            #print(tokens)
+            #print(postfixRegex)
 
-            '''objdirect = AFDD(tokens,chain,postfixRegex)
-            AFD = objdirect.generateDirectAFD()'''
+            objdirect = DirectAFD(tokens,chain,postfixRegex)
+            AFD = objdirect.generateDirectAFD()
 
     elif(option == '3'):
         print('\nAdios! ')

@@ -102,3 +102,10 @@ def stringToArray(string):
     result.pop()
     return result
     #print(spacesToString('1ε|**'))
+
+def representsInt(st):
+        try: 
+            int(st)
+            return True
+        except ValueError:
+            return False

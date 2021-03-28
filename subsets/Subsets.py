@@ -9,11 +9,13 @@
 from graphviz import Digraph
 import time
 import collections
+
+import sys
+sys.path.append(".")
 from functions import *
 from graphs.NodeT import *
 from graphs.RelationT import RelationT
-import sys
-sys.path.append(".")
+
 
 
 class Subsets:
@@ -183,9 +185,6 @@ class Subsets:
         dict_ = {}
         for key,val in resultAFD.items():
             dict_[key] = val[0]
-        #for key,val in resultAFD.items():
-        #    dict_[key] = val[0]
-
         return dict_
 
     def drawAFD(self, filename='subsets-afd'):

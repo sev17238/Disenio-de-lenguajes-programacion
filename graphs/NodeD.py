@@ -5,33 +5,45 @@
 # NodeD.py
 ######################################################
 
-class NodeT:
+class NodeD:
     """
-    Clase para representar a un nodo en el calculo del anulable, primerapos y ultimapos
+    Clase para representar a un nodo en el calculo del annullable, firstpos y lastpos
 
     Atributos:
-     - anulable: True o False
-     - primerapos: arreglo con estados
-     - ultimapos: arreglo con estados
+     - annullable: True o False
+     - firstpos: arreglo con estados
+     - lastpos: arreglo con estados
     """
-    def __init__(self,anulable,primerapos,ultimapos):
-        self.anulable = anulable
-        self.primerapos = primerapos
-        self.ultimapos = ultimapos
+    def __init__(self,annullable,firstpos,lastpos,token):
+        self.annullable = annullable
+        self.firstpos = firstpos
+        self.lastpos = lastpos
+        self.token = token
 
     #gets_________________
-    def getUltimaPos(self):
+    def getLastPos(self):
         u_pos = []
-        for i in self.ultimapos:
+        for i in self.lastpos:
             u_pos.append(i)
         return u_pos
 
-    def getPrimeraPos(self):
+    def getFirstPos(self):
         p_pos = []
-        for i in self.ultimapos:
+        for i in self.firstpos:
             p_pos.append(i)
         return p_pos
 
-    def getAnulable(self):
-        anulable = self.anulable
-        return anulable
+    def getAnnullable(self):
+        annullable = self.annullable
+        return annullable
+
+    def getToken(self):
+        token = self.token
+        return token
+
+    #sets_________________
+    def setFirstPos(self,firstpos):
+        self.firstpos = firstpos
+
+    def setLastPos(self,lastpos):
+        self.lastpos = lastpos

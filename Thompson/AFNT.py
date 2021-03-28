@@ -8,11 +8,13 @@
 # imports _________________________
 import time
 import collections
+
+import sys
+sys.path.append(".")
 from functions import *
 from graphs.NodeT import *
 from graphs.RelationT import RelationT
-import sys
-sys.path.append(".")
+
 from graphviz import Digraph
 
 class AFNT:
