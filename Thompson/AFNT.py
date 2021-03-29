@@ -13,7 +13,7 @@ import sys
 sys.path.append(".")
 from functions import *
 from graphs.NodeT import *
-from graphs.RelationT import RelationT
+from graphs.Relation import Relation
 
 from graphviz import Digraph
 
@@ -102,7 +102,7 @@ class AFNT:
         node2 = NodeT(isAccepting=True)
 
         # Relacion: origen ---a---> Destino
-        relation = RelationT(counter,token,counter+1)
+        relation = Relation(counter,token,counter+1)
         node1.addRelation(relation)
 
         #node2.clearRelations()
@@ -197,9 +197,9 @@ class AFNT:
         f_node = NodeT(isAccepting=True)
 
         # relacion del nodo inicial de OR hacia el nodo inicial del grafo 1 a travez de epsilon
-        i_node_rel_to_AFN1 = RelationT(counter,'ε',id_inode_graph1)
+        i_node_rel_to_AFN1 = Relation(counter,'ε',id_inode_graph1)
         # relacion del nodo inicial de OR hacia el nodo inicial del grafo 2 a travez de epsilon
-        i_node_rel_to_AFN2 = RelationT(counter,'ε',id_inode_graph2)
+        i_node_rel_to_AFN2 = Relation(counter,'ε',id_inode_graph2)
 
         #se agregan las relaciones al nodo inicial del grafo OR
         orGraph[counter].addRelation(i_node_rel_to_AFN1)
@@ -207,9 +207,9 @@ class AFNT:
         counter = afnCounter2+1
 
         # relacion del nodo inicial de OR hacia el nodo inicial del grafo 1
-        AFN1_to_f_node_OR = RelationT(id_fnode_graph1,'ε',counter)
+        AFN1_to_f_node_OR = Relation(id_fnode_graph1,'ε',counter)
         # relacion del nodo inicial de OR hacia el nodo inicial del grafo 2
-        AFN2_to_f_node_OR = RelationT(id_fnode_graph2,'ε',counter)
+        AFN2_to_f_node_OR = Relation(id_fnode_graph2,'ε',counter)
 
         #relacionamos el ultimo nodo del grafo 1 al ultimo nodo del grafo OR con epsilon
         orGraph[afnCounter1].addRelation(AFN1_to_f_node_OR)
@@ -262,16 +262,16 @@ class AFNT:
 
         #se procede a crear las 4 relaciones a travez de epsilon en un grafo kleene
         #relacion entre el nodo inicial y el nodo final de kleene a travez de epsilon
-        rel_i_to_f = RelationT(initCounterKleene,'ε',counter)
+        rel_i_to_f = Relation(initCounterKleene,'ε',counter)
         kleeneGraph[initCounterKleene].addRelation(rel_i_to_f)
         #relacion entre el nodo inicial de kleene y el grafo 1
-        rel_i_to_igraph1 = RelationT(initCounterKleene,'ε',id_inode_graph1)
+        rel_i_to_igraph1 = Relation(initCounterKleene,'ε',id_inode_graph1)
         kleeneGraph[initCounterKleene].addRelation(rel_i_to_igraph1)
         #relacion entre el nodo final del grafo 1 y el nodo final de kleene
-        rel_fgraph1_to_f = RelationT(id_fnode_graph1,'ε',counter)
+        rel_fgraph1_to_f = Relation(id_fnode_graph1,'ε',counter)
         kleeneGraph[id_fnode_graph1].addRelation(rel_fgraph1_to_f)
         #relacion entre el nodo final del grafo 1 y el nodo final de kleene
-        rel_fgraph1_to_igraph1 = RelationT(id_fnode_graph1,'ε',id_inode_graph1)
+        rel_fgraph1_to_igraph1 = Relation(id_fnode_graph1,'ε',id_inode_graph1)
         kleeneGraph[afnCounter1].addRelation(rel_fgraph1_to_igraph1)
 
         #actualizamos el array de afns con el grafo kleene recien construido

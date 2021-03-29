@@ -2,13 +2,12 @@
 # Diego Sevilla
 # 17238
 ######################################################
-# RelationT.py
+# Relation.py
 ######################################################
 
-class RelationT:
+class Relation:
     '''
     Clase que representa una relacion entre 2 nodos
-    tomando en cuenta el algoritmo de thompsons
 
     Atributos:
      - origin = the origin node 

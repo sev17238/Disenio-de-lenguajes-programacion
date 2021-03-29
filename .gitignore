@@ -136,6 +136,7 @@ tests/
 
 graphs-subsets/
 graphs-thompson/
+graphs-direct/
 
 *tests.py
 *test.py

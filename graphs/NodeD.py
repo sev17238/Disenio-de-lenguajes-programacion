@@ -47,3 +47,44 @@ class NodeD:
 
     def setLastPos(self,lastpos):
         self.lastpos = lastpos
+
+
+
+class NodeDD:
+    """
+    Clase para representar a un nodo en el AFD directo final
+
+    Atributos:
+     - state: el estado. En un principio sera un arreglo Ej. [1,2,3], luego este sera representado por un estado
+     dependiendo del orden de este nodo en el diccionario que lo contenga
+     - relations: las relaciones del nodo
+     - 
+    """
+    def __init__(self,states,isInitial=False,isAccepting=False):
+        self.isInitial = isInitial
+        self.isAccepting = isAccepting
+        self.relations = []
+        self.states = states
+
+    #gets_________________
+    def getStates(self):
+        states = self.states
+        return states
+
+    def getIsInitial(self):
+        isInit = self.isInitial
+        return isInit
+
+    def getIsAccepting(self):
+        isAcc = self.isAccepting
+        return isAcc
+
+    def getRelations(self):
+        rels = []
+        for i in self.relations:
+            rels.append(i)
+        return rels
+
+    #others
+    def addRelation(self,relation):
+        self.relations.append(relation)

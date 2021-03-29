@@ -14,7 +14,7 @@ import sys
 sys.path.append(".")
 from functions import *
 from graphs.NodeT import *
-from graphs.RelationT import RelationT
+from graphs.Relation import Relation
 
 
 
@@ -268,4 +268,3 @@ class Subsets:
             self.AFDStates.append(initAFDState)
             #Llamamos a build_afd
             self.build_afd(self.AFDStates)
-

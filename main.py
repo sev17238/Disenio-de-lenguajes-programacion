@@ -67,7 +67,6 @@ while True:
             postfixRegex = stringToArray(postfixRegex)
 
             print(' - alfabeto (tokens): '+str(tokens))
-            #print(str(postfixRegex))
 
             obj_afn = AFNT(tokens,chain)
             AFN = obj_afn.generateAFN(postfixRegex)
@@ -81,12 +80,11 @@ while True:
         if(postfixRegex == 'ERROR_POSTFIX_)'):
             print('\n ")" faltante en la expresion regular ingresada. Vuelva a intentar. \n')
         else:
-            print('\nExpresion postfix: '+ postfixRegex)
+            print(' - postfix     = '+ postfixRegex)
             tokens = getRegExUniqueTokens(postfixRegex)
             postfixRegex = stringToArray(postfixRegex)
 
-            #print(tokens)
-            #print(postfixRegex)
+            print(' - alfabeto (tokens): '+str(tokens))
 
             objdirect = DirectAFD(tokens,chain,postfixRegex)
             AFD = objdirect.generateDirectAFD()
