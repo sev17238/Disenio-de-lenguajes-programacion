@@ -134,7 +134,9 @@ logs/
 ref/
 tests/
 
-graphs-output/
+#graphs-subsets/
+#graphs-thompson/
+#graphs-direct/
 
 *tests.py
 *test.py

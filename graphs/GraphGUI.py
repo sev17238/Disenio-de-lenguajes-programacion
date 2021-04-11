@@ -15,7 +15,7 @@ from graphs.Node import Node
 
 class GraphGUI:
     '''
-    Clase para construir un grafo y dibujarlo
+    Clase para dibujar un grafo.
 
     Atributos:
      - name = nombre del grafo
@@ -24,6 +24,7 @@ class GraphGUI:
     def __init__(self,name,nodes):
         self.name = name
         self.nodes = nodes
+        self.graph = Digraph(comment='Test 1',format='png', engine='sfdp')
 
     #others
     def drawGraph(self):
@@ -31,7 +32,7 @@ class GraphGUI:
         dot = Digraph(comment='Test 1',filename=file_name,format='png', engine='sfdp')
         dot.attr(size='8,5')
         dot.attr('node', shape='circle')
-        dot.attr('node',style='filled',color='lightgrey')
+        dot.attr('node',style='filled',color='lightblue') #,color='lightgrey'
 
         nodes = self.nodes
         for i in nodes:
@@ -72,29 +73,6 @@ def main():
     graph = GraphGUI('g1',arr)
 
     graph.drawGraph()'''
-
-    dic = {0:'node1',1:'node2'}
-    print('dic1: '+str(dic))
-
-    dic2 = {0:'node1',1:'node2'}
-    print('dic2: '+str(dic2))
-
-    #se elimina el nodo inicial del grafo A
-    dic2.pop(0)
-    print('popeddic2: '+str(dic2.get))
-
-    dic.update({2:dic2[0]})
-
-    print('dic1: '+str(dic))
-
-    keyy = len(dic)-1
-    print(keyy)
-    #grafos se unen
-    for i in range(0,len(dic2)):
-        dic.update({2:dic2[0]})
-        keyy += 1
-
-    print(dic)
 
 if __name__ == "__main__":
     main()

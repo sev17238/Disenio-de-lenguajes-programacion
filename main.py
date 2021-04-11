@@ -12,8 +12,11 @@
 import os
 import sys
 sys.path.append(".")
-from InfixPostfixRelated.InfixRegexToPostfix import InfixRegexToPostfix
-
+from infix_postfix_related.InfixRegexToPostfix import InfixRegexToPostfix
+from thompson.AFNT import AFNT
+from subsets.Subsets import Subsets
+#from direct.DirectAFD_d import DirectAFD
+from direct.DirectAFD import DirectAFD
 from functions import *
 import collections
 
@@ -36,9 +39,22 @@ def userInteraction():
     expresion = input('Ingrese una expresion regular: ')
     expresion = expresion.replace(' ','')
     chain = input('Ingrese la cadena a evaluar: ')
-    chain = expresion.replace(' ','')
+    chain = chain.replace(' ','')
 
     obj = InfixRegexToPostfix()
+    postfix = obj.infix_to_postfix(expresion)
+
+    return postfix, chain
+
+def userInteractionDirect():
+    '''En esta funcion se agrega el '#' para las operaciones relacionados a la conversion directa. '''
+    expresion = input('Ingrese una expresion regular: ')
+    expresion = expresion.replace(' ','')
+    chain = input('Ingrese la cadena a evaluar: ')
+    chain = chain.replace(' ','')
+
+    obj = InfixRegexToPostfix()
+    expresion = '('+expresion+')#'
     postfix = obj.infix_to_postfix(expresion)
 
     return postfix, chain
@@ -51,7 +67,7 @@ welcome()
 while True:
 
     menu()
-    option = input('Ingrese una opacion: ')
+    option = input('Ingrese una opcion: ')
 
     if(option == '1'):
         chain = ''
@@ -65,29 +81,30 @@ while True:
             postfixRegex = stringToArray(postfixRegex)
 
             print(' - alfabeto (tokens): '+str(tokens))
-            #print(str(postfixRegex))
 
-            '''objafn = AFNT(tokens,chain)
-            AFN = objafn.generateAFN(postfixRegex)
-
-            objafd = AFDS(tokens,chain,AFN)
-            AFD = objafd.generateAFDFromAFN()'''
+            obj_afn = AFNT(tokens,chain)
+            AFN = obj_afn.generateAFN(postfixRegex)
+            
+            obj_afd = Subsets(tokens,chain,AFN)
+            AFD = obj_afd.afn_to_afd_process()
 
     elif(option == '2'):
         # Pruebas de funcionalidad
-        postfixRegex,chain = userInteraction()
+        postfixRegex,chain = userInteractionDirect()
         if(postfixRegex == 'ERROR_POSTFIX_)'):
             print('\n ")" faltante en la expresion regular ingresada. Vuelva a intentar. \n')
         else:
-            print('\nExpresion postfix: '+ postfixRegex)
+            print(' - postfix     = '+ postfixRegex)
             tokens = getRegExUniqueTokens(postfixRegex)
             postfixRegex = stringToArray(postfixRegex)
 
-            print(tokens)
-            print(postfixRegex)
+            print(' - alfabeto (tokens): '+str(tokens))
 
-            '''objdirect = AFDD(tokens,chain,postfixRegex)
-            AFD = objdirect.generateDirectAFD()'''
+            #objdirect = DirectAFD(tokens,chain,postfixRegex)2
+            #AFD = objdirect.generateDirectAFD()
+
+            objdirect = DirectAFD(tokens,chain,postfixRegex)
+            AFD = objdirect.generateDirectAFD()
 
     elif(option == '3'):
         print('\nAdios! ')

@@ -2,39 +2,22 @@
 # Diego Sevilla
 # 17238
 ######################################################
-# infix_regex_to_postfix.py
+# InfixRegexToPostfix.py
 ######################################################
 # Programa que evalua una expresion regular en notacion
 # infix, sustituye operadores equivalentes y la 
-# traduce a notacion postfix usando el algoritmo 
-# de Shunting-yard.
+# traduce a notacion postfix 
 ######################################################
-
-#Descripcion de algoritmo______________________________________________
-'''
-A simple conversion, Shunting-yard algorithm
-    1. Input: 3 + 4
-    2. Push 3 to the output queue (whenever a number is read it is pushed to the output)
-    3. Push + (or its ID) onto the operator stack
-    4. Push 4 to the output queue
-    5. After reading the expression, pop the operators off the stack and add them to the output.
-       In this case there is only one, "+".
-    6. Output: 3 4 +
-
-This already shows a couple of rules:
-    All numbers are pushed to the output when they are read.
-    At the end of reading the expression, pop all operators off the stack and onto the output.
-'''
 
 #Clase de implementacion_________________________________________________
 class InfixRegexToPostfix:
     '''
-    Clase que utiliza el algoritmo de Shunting-yard para la conversion de una expresion regular
-    en formato infix a formato postfix
+    Clase que realiza modificaciones a una expresion infix y luego la convierte a formato postfix
 
     Atributos:
      - expresion --> la expresion regular en formato infix
     '''
+    # Constructor de las variables
     def __init__(self):
         self.operators_precedence = {
         1: '(',
@@ -61,7 +44,6 @@ class InfixRegexToPostfix:
     def get_precendence(self,character):
         '''
         Funcion que retorna la precedencia del operador ingresado.
-
         Parametros:
         - character: un caracter o token
         - return - la precedencia correspondiente
@@ -130,12 +112,12 @@ class InfixRegexToPostfix:
                     if(eqRegex[i] == '('):
                         break
                 substringToReplace = equivalent +'+'
-                equivalent = '('+equivalent+')('+equivalent+')*'
+                equivalent = '('+equivalent+'.'+equivalent+'*)'
                 #print('finish reverse for')
             else:
                 addToIndex = addToIndex +1
                 substringToReplace = itemBeforeOp+'+'
-                equivalent = '('+itemBeforeOp+')('+itemBeforeOp+')*'
+                equivalent = '('+itemBeforeOp+'.'+itemBeforeOp+'*)'
             eqRegex = eqRegex.replace(substringToReplace,equivalent)
 
         index = index + addToIndex
@@ -165,6 +147,46 @@ class InfixRegexToPostfix:
 
         return eqRegex
 
+    def replaceQuestionMark(self, exp):
+        value = "?" in exp
+        if(value == False):
+            return exp
+        else:
+            index = exp.find('?')
+            if exp[index-1] == ")":
+                inside = ""
+                for i in reversed(exp[0:index-1]):
+                    inside += i
+                    if i == "(":
+                        inside = inside[::-1]
+                        quantity1 = len(inside)
+                        quantity2 = len(exp[0:index-1])
+                        ignore = quantity2 - quantity1
+                        inside = inside[1:len(inside)]
+                        return self.replaceQuestionMark(exp[0:ignore] + "(" + inside + "|ε)" + exp[index+1:len(exp)])
+            else:
+                return self.replaceQuestionMark(exp[0:index-1] + "(" + exp[index-1] + "|ε)" + exp[index+1:len(exp)])
+
+    def replacePlus(self, exp):
+        value = "+" in exp
+        if(value == False):
+            return exp
+        else:
+            index = exp.find('+')
+            if exp[index-1] == ")":
+                inside = ""
+                for i in reversed(exp[0:index-1]):
+                    inside += i
+                    if i == "(":
+                        inside = inside[::-1]
+                        quantity1 = len(inside)
+                        quantity2 = len(exp[0:index-1])
+                        ignore = quantity2 - quantity1
+                        inside = inside[1:len(inside)]
+                        return self.replacePlus(exp[0:ignore] + "(" + inside + "(" + inside + ")*" + ")" + exp[index+1:len(exp)])
+            else:
+                return self.replacePlus(exp[0:index-1] + "(" + exp[index-1] + exp[index-1] + "*)" + exp[index+1:len(exp)])
+
     def format_reg_ex(self,regex):
         ''' 
             Funcion que transforma una expresion regular insertando un '.' 
@@ -190,6 +212,7 @@ class InfixRegexToPostfix:
 
         return res
 
+
     def infix_to_postfix(self,expresion):
         '''
         Funcion que convierte una expresion regular en formato infix a formato postfix.
@@ -199,11 +222,15 @@ class InfixRegexToPostfix:
 
         postfix = ''
         stack = []
-        #eqRegex = self.replace_cases_with_equivalents(regex)
-        #formattedRegex = self.format_reg_ex(eqRegex)
 
-        formattedRegex = self.format_reg_ex(regex)
-        eqRegex = self.replace_cases_with_equivalents(formattedRegex)
+        
+        eqRegexPlus = self.replacePlus(regex)
+        eqRegexQuestion = self.replaceQuestionMark(eqRegexPlus)
+        formattedRegex = self.format_reg_ex(eqRegexQuestion)
+        eqRegex = formattedRegex
+
+        #formattedRegex = self.format_reg_ex(regex)
+        #eqRegex = self.replace_cases_with_equivalents(formattedRegex)
 
         for cc in range(len(eqRegex)):
             c = eqRegex[cc]
@@ -242,12 +269,14 @@ class InfixRegexToPostfix:
         #print('postfix   = '+postfix)
         return postfix.replace('..','.')
 
+
 # Main______________________________________________
 def main():
-    obj = InfixRegexToPostfix()
+    #obj = InfixRegexToPostfix()
     
     #PRUEBAS
-    '''print(obj.infix_to_postfix('(a*|b*)c'))
+    '''
+    print(obj.infix_to_postfix('(a*|b*)c'))
     print(obj.infix_to_postfix('(b|b)*abb(a|b)*'))
     print(obj.infix_to_postfix('(a|ε)b(a+)c?'))
     print(obj.infix_to_postfix('(a|b)*a(a|b)(a|b)'))
@@ -262,19 +291,23 @@ def main():
     print(obj.infix_to_postfix('0?(1|ε)?0*'))
     print(obj.infix_to_postfix('((1?)*)*'))
     print(obj.infix_to_postfix('(01)*(10)*'))
-    print(obj.infix_to_postfix('(a|b)*a(a|b)(a|b)'))'''
+    print(obj.infix_to_postfix('(a|b)*a(a|b)(a|b)'))
+    '''
 
     #E. R. CORRECTAS
+    '''
     print('EXPRESIONES REGULARES CORRECTAS ----')
     print(obj.infix_to_postfix('((1?)*)*'))
     print(obj.infix_to_postfix('(a|ε)b(a+)c?'))
     print(obj.infix_to_postfix('(1|0)+001'))
     print(obj.infix_to_postfix('(εa|εb)*abb'))
+    '''
 
 
     #E. R. Incorrectas (manejo de errores)
     #rint('EXPRESIONES REGULARES INCORRECTAS ----')
-    '''print(obj.infix_to_postfix('(a|b)*a(a|b)(a|b)+'))
+    '''
+    print(obj.infix_to_postfix('(a|b)*a(a|b)(a|b)+'))
     print(obj.infix_to_postfix('(a|b*a(a|b)(a|b)+'))
     print(obj.infix_to_postfix('((1?)*)*'))
     print(obj.infix_to_postfix('(1?)*)*'))
