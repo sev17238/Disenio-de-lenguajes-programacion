@@ -9,7 +9,7 @@ Curso, Diseño de lenguajes y programacion
 <hr />
 
 ## Descripcion
-Repositorio con los trabajos realizados durante las etapas del curso de Diseño de lenguajes de programacion
+Repositorio con los trabajos realizados durante las etapas del curso de Diseño de lenguajes de programacion 
 
 ## Tabla de contenido
 Herramientas utilizadas en el proyecto:
