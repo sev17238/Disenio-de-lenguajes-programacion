@@ -15,6 +15,7 @@ sys.path.append(".")
 from infix_postfix_related.InfixRegexToPostfix import InfixRegexToPostfix
 from thompson.AFNT import AFNT
 from subsets.Subsets import Subsets
+#from direct.DirectAFD_d import DirectAFD
 from direct.DirectAFD import DirectAFD
 from functions import *
 import collections
@@ -41,6 +42,19 @@ def userInteraction():
     chain = chain.replace(' ','')
 
     obj = InfixRegexToPostfix()
+    postfix = obj.infix_to_postfix(expresion)
+
+    return postfix, chain
+
+def userInteractionDirect():
+    '''En esta funcion se agrega el '#' para las operaciones relacionados a la conversion directa. '''
+    expresion = input('Ingrese una expresion regular: ')
+    expresion = expresion.replace(' ','')
+    chain = input('Ingrese la cadena a evaluar: ')
+    chain = chain.replace(' ','')
+
+    obj = InfixRegexToPostfix()
+    expresion = '('+expresion+')#'
     postfix = obj.infix_to_postfix(expresion)
 
     return postfix, chain
@@ -76,7 +90,7 @@ while True:
 
     elif(option == '2'):
         # Pruebas de funcionalidad
-        postfixRegex,chain = userInteraction()
+        postfixRegex,chain = userInteractionDirect()
         if(postfixRegex == 'ERROR_POSTFIX_)'):
             print('\n ")" faltante en la expresion regular ingresada. Vuelva a intentar. \n')
         else:
@@ -85,6 +99,9 @@ while True:
             postfixRegex = stringToArray(postfixRegex)
 
             print(' - alfabeto (tokens): '+str(tokens))
+
+            #objdirect = DirectAFD(tokens,chain,postfixRegex)2
+            #AFD = objdirect.generateDirectAFD()
 
             objdirect = DirectAFD(tokens,chain,postfixRegex)
             AFD = objdirect.generateDirectAFD()

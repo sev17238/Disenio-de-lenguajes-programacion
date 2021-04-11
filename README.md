@@ -19,12 +19,20 @@ Herramientas utilizadas en el proyecto:
 ## Instalacion
 1. Clonar el repositorio con `https://github.com/sev17238/Disenio-de-lenguajes-programacion.git`
 2. Ir al directorio correspondiente: `cd Disenio-de-lenguajes-programacion`.<br />
-3. Correr los archivos deseados. `python file.py params*` 
+3. Correr el archivo principal. `python main.py` 
 
+## Notas
+1. Directorios con prefijo `graphs-` contienen los automatas de salida obtenidos
+   con los algoritmos de thompson, subconjuntos y conversion directa
 ## Referencias
  - Compilers: Principles, Techniques, & Tools. Second Edition.
  - https://www.geeksforgeeks.org
  - https://www.w3schools.com
+
+## Agradecimientos
+ - Prof. Bidkar Pojoy
+ - El café
+ - Compañeros de clase
 
 ## Licensia
 No license.

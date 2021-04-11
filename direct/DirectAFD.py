@@ -1,410 +1,313 @@
+
 ######################################################
 # Diego Sevilla
 # 17238
 ######################################################
-# Direct.py
+# DirectAFD.py
 ######################################################
 
-# imports _________________________
+# zona de imports de librerías
 import time
 import collections
 import sys
 sys.path.append(".")
 from functions import *
 from graphs.NodeD import *
-from graphs.Relation import *
 from graphviz import Digraph
 
 class DirectAFD:
     """Clase que comvierte una expresion regular en formato postfix a un automara finito determinista AFD.
     """
 
-    def __init__(self, tokens, chain, postfix_regex):
+    def __init__(self, tokens, chain, postfixRegex):
+        self.expresionPostfix = postfixRegex
+        self.tokens = tokens
         self.chain = chain
-        self.alphabet = tokens
-        self.postfix_regex = postfix_regex
-
-        self.firstLastPos = {}
-        self.nextPos = {}
-
-        self.AFDArray = []
-        self.AFDResult = {}
-
-        # para todos los nodos en general
-        self.globalCounter = 0
-        # para los nodos sin hijos
-        self.globalCounterStates = 0
-
-    def posfixParse(self):
-        """
-        Funcion para recorrer la cadena postfix e interpretar
-        cada uno de los tokens y operandos
-        """
-
-        expresion_hash = self.postfix_regex + ['#','.']
-        for token in expresion_hash:
-            # Se aumenta el contador de estados cada vez que se encuentra un caracter del alfabeto.
-            # Este nos servira para los valores de los nodos sin hijos
-            if(token in "".join(self.alphabet) or token == "#"):
-                self.globalCounterStates += 1
-            #sabemos que estos primeros 2 caracteres en la expresion postfix pertenceran al alfabeto
-            if(len(self.firstLastPos) < 2):
-                counter = self.globalCounterStates
-                self.createChildlessNode(token,counter)
-            #inmediatamente despues vendra uno o varios operadores y posteriormente mas tokens
-            else:
-                if(token == '*'):
-                    counter = self.globalCounter
-                    #nodos hijos del nodo que se creara
-                    c1 = self.firstLastPos[counter]
-
-                    # calculamos anulable segun la tabla magica
-                    annullable = True
-                    # calculamos firstpos segun la tabla magica
-                    firstpos = c1.getFirstPos()
-                    # calculamos firstpos segun la tabla magica
-                    lastpos = c1.getLastPos()
-
-                    node = NodeD(annullable,firstpos,lastpos,token)
-                    #ingresamos el nodo creado al diccionario global
-                    self.firstLastPos[counter+1] = node
-                    self.globalCounter += 1
-                else:
-                    counter = self.globalCounter
-                    #nodos hijos del nodo que se creara
-                    #if(self.firstLastPos[counter].getToken() == '*'):
-                    #    c1 = self.firstLastPos[counter]
-                    #    c2 = self.firstLastPos[counter-1]
-                    #else:
-                    c2 = self.firstLastPos[counter]
-                    c1 = self.firstLastPos[counter-1]
-
-                    # si los dos son . o | entonces el nodo que se creara no tendra hijos
-                    if(c1.getToken() in ".|*" and c2.getToken() in ".|*"):
-                        counter = self.globalCounterStates
-                        self.createChildlessNode(token,counter)
-                    elif(c1.getToken() in ".|*" or c2.getToken() in ".|*"):
-                        if(token in "".join(self.alphabet) or token == "#"):
-                            counter = self.globalCounterStates
-                            self.createChildlessNode(token,counter)
-                        else:
-                            self.createNodeWithChildren(token,c1,c2,counter)
-                    else:
-                        self.createNodeWithChildren(token,c1,c2,counter)
-
-        #print(self.firstLastPos)
-
-    def createNodeWithChildren(self,token,c1,c2,counter):
-        """Funcion que crea un nodo con hijos
-
-        - Args:
-            - token (str): el token en cuestion
-            - c1 (NodeD): el nodo izquierdo
-            - c2 (NodeD): el nodo derecho
-            - counter (int): el contador global
-        """
-        annullable, firstpos, lastpos = self.checksForAnnullableFirstposAndLastpos(token,c1,c2,counter)
-
-        node = NodeD(annullable,firstpos,lastpos,token)
-        #ingresamos el nodo creado al diccionario global
-        self.firstLastPos[counter+1] = node
-        self.globalCounter += 1
-
-    def createChildlessNode(self,token,counter):
-        """Funcion para crear un nodo sin hijos
-
-        - Args:
-            - token (str): el token en cuestion
-            - counter (int): el contador global de estados especifico para los tokens del alfabeto
-        """
-        annullable = False
-        firstpos = [counter]
-        lastpos = [counter]
-        node = NodeD(annullable,firstpos,lastpos,token)
-        self.firstLastPos[self.globalCounter+1] = node
-        self.globalCounter += 1
-
-    def checksForAnnullableFirstposAndLastpos(self, token, c1, c2,counter):
-        """Tabla magica para los valores posibles de Annullable, firstpos y lastpos
-
-        - Args:
-            - token (str): el token en cuestion
-            - c1 (NodeD): el nodo izquierdo en cuestion
-            - c2 (NodeD): el nodo derecho en cuestion
-            - counter (int): contador que sirve para saber el estado de los nodos
-        - Returns:
-            - arr: un arreglo con los valores para annullable, firstpos y lastpos
-        """
-        if(token in "".join(self.alphabet) or token == "#"):
-            #return token
-            return False, [counter+1], [counter+1]
-        elif(not(token in "".join(self.alphabet))):
-            if(token == 'ε'):
-                return True,[],[]
-            elif(token == '|'):
-                pos_s = c1.getFirstPos() + c2.getFirstPos()
-                if(c1.getAnnullable() == False and c2.getAnnullable() == False):
-                    return False, pos_s, pos_s
-                elif(c1.getAnnullable() == False and c2.getAnnullable() == True):
-                    return True, pos_s, pos_s
-                elif(c1.getAnnullable() == True and c2.getAnnullable() == False):
-                    return True, pos_s, pos_s
-                else: #(c1.getAnnullable() == True and c2.getAnnullable() == True):
-                    return True, pos_s, pos_s
-            elif(token == '.'):
-                firstpos = None
-                lastpos = None
-                if(c1.getAnnullable()):
-                    firstpos = c1.getFirstPos() + c2.getFirstPos()
-                elif(c1.getAnnullable() == False):
-                    firstpos = c1.getFirstPos()
-
-                if(c2.getAnnullable()):
-                    lastpos = c1.getFirstPos() + c2.getFirstPos()
-                elif(c2.getAnnullable() == False):
-                    lastpos = c2.getFirstPos()
-
-                if(c1.getAnnullable() == False and c2.getAnnullable() == False):
-                    return False, firstpos, lastpos
-                elif(c1.getAnnullable() == False and c2.getAnnullable() == True):
-                    return False, firstpos, lastpos
-                elif(c1.getAnnullable() == True and c2.getAnnullable() == False):
-                    return False, firstpos, lastpos
-                else: #if(c1.getAnnullable() == True and c2.getAnnullable() == True):
-                    return True, firstpos, lastpos
-
-            '''else: #(token == '*'):
-                return c1.getFirstPos()'''
-
-    def buildNextPos(self):
-        """Funcion para la construccion de nextpos a partir del arbol con los annullable, firstpos y lastpos
-        """
-        tree = self.firstLastPos
-        localStateCounter = 0
-        for id, node in tree.items():
-            if(node.getToken() == '.'):
-                c1 = tree[id-2]
-                for state in c1.getLastPos():
-                    c2 = tree[id-1]
-
-                    #self.nextPos[node.getLastPos()] = c1.getFirstPos() + c2.getLastPos()
-                    if(state in self.nextPos):
-                        self.nextPos[state] = self.nextPos[state] + c2.getFirstPos()
-                    else:
-                        self.nextPos[state] = c2.getFirstPos()
-
-            elif(node.getToken() == '*'):
-                for state in node.getLastPos():
-                    if(state in self.nextPos):
-                        self.nextPos[state] = self.nextPos[state] + node.getLastPos()
-                    else:
-                        self.nextPos[state] = node.getLastPos()
-                        localStateCounter += 1
-
-        self.nextPos[len(self.nextPos)+1] = []
-
-        tokensInPostfix = []
-        for token in self.postfix_regex:
-            if(token in "".join(self.alphabet)):
-                tokensInPostfix.append(token)
-
-        counter = 1
-        for token in tokensInPostfix:
-            self.nextPos[counter] = [token,self.nextPos[counter]]
-            counter += 1
-        self.nextPos[counter] = ['#',self.nextPos[counter]]
-        #print(self.nextPos)
-
-
-    def nextPosToAFD(self):
-        #se actualiza el contador global para que el diccionario AFDResult empiece a partir de 1
-        self.globalCounter = 0
-        counter = self.globalCounter
-
-        #el firstPos de la raiz del arbol sera el estado inicial
-        initial_state = self.firstLastPos[len(self.firstLastPos)].getFirstPos()
-        init_node = NodeDD(initial_state,isInitial=True)
-        self.AFDResult[counter] = init_node
-        self.globalCounter += 1
-
-        tempNextPos = []
-
-        self.checkNextPosState(init_node)
-
-        local_counter = 0
-        stop = False
-        #stop sera verdadero cuando ya no se generen mas estados a partir del nodo en cuestion
-        while(stop != True):
-            #se obtiene el siguiente nodo
-            node = self.AFDResult[local_counter+1]
-            #se chequea diccionario en nextPost. Pueden agregarse nodos o no
-            stop = self.checkNextPosState(node)
-
-            local_counter += 1
-
-        #print(self.AFDResult)
-
-
-    def checkNextPosState(self,current_node):
-        tempEqualStates = {}
-        #iteramos en los estados del nodo en cuestion y almacenamos los valores de nextPos que apliquen
-        for state in current_node.getStates():
-            for node_num, token_nextpos in self.nextPos.items():
-                if(node_num == state):
-                    tempEqualStates[node_num] = token_nextpos
-
-        wasAtLeastANodeAdded = 0
-        #ahora iteramos en los esatodos de nextPos que aplican y buscar si hay tokens repetidos
-        for token in self.alphabet:
-            tempEqualTokens = {}
-            for node_state, token_nextpos in tempEqualStates.items():
-                if(token_nextpos[0] == token):
-                    tempEqualTokens[node_state] = token_nextpos
-
-            newPosibleStateset = []
-            # suma de nextPoses 
-            for node_state, token_nextpos in tempEqualTokens.items():
-                newPosibleStateset = newPosibleStateset + token_nextpos[1]
-            # Eliminacion de duplicados
-            newPosibleStateset = list(dict.fromkeys(newPosibleStateset))
-            # Los estados se ordenan de forma ascendente
-            newPosibleStateset.sort()
-            
-            counter = self.globalCounter
-            #si el set de estados no existe entonces se agrega el nuevo nodo
-            if(not(self.checkStatesetExistenceInAFD(newPosibleStateset))):
-                #se crea el nuevo nodo
-                if(len(self.nextPos) in newPosibleStateset):
-                    newNode = NodeDD(newPosibleStateset,isAccepting=True)
-                else:
-                    newNode = NodeDD(newPosibleStateset)
-                #se crea relacion del nodo anterior al nodo que se esta creando
-                #rel = Relation(counter,token,newNode.getStates())
-                rel = Relation(counter-1,token,counter)
-                prevNode = self.AFDResult[counter-1]
-                prevNode.addRelation(rel)
-
-                self.AFDResult[counter] = newNode
-                self.globalCounter += 1
-                wasAtLeastANodeAdded += 1
-            else:
-                if(current_node.getStates() == newPosibleStateset):
-                    for id, node_l in self.AFDResult.items():
-                        if(node_l.getStates() == newPosibleStateset):
-                            rel = Relation(id,token,id)
-                            #rel = Relation(counter-1,token,counter-1)
-                            nodeToAddRelation = self.AFDResult[id]
-                            nodeToAddRelation.addRelation(rel)
-                            #current_node.addRelation(rel)
-                            break
-                else:
-                    for id, node_l in self.AFDResult.items():
-                        if(node_l.getStates() == newPosibleStateset):
-                            rel = Relation(counter-1,token,id)
-                            #nodeToAddRelation = self.AFDResult[id]
-                            current_node.addRelation(rel)
-                            break
         
-        if(wasAtLeastANodeAdded == 0):
-            return True
-        else:
-            return False
+        self.globalCounter = 1
+        self.globalCounter2 = 0
+        self.nextPosDict = {}
+        self.functions = functions()
+        self.DStates = []
+        self.DStates2 = []
+        
+        self.nodesArray = []
+        self.resultAFD = {}
+        self.resultAFDArray = []
+        # variables para el AFN
+        
+    def getPosFromCharacter(self, character):
+        """
+        Dada una letra, nos retorna el valor de id de esa letra. Puede haber varias
+        """
+        array = []
+        for numero, nodo in self.resultAFD.items():
+            if(nodo.getNodeChar() == character):
+                array.append(nodo.getNodeId())
 
+        return array
 
-    def checkStatesetExistenceInAFD(self,newPosibleStateset):
-        """Funcion para revisar si el set de estados ya existe en el afd que se esta construyendo
+    def getFinalStateId(self):
+        """Obtenemos el estado final del diccionario de nextPost.
+            
+        Returns:
+            list: el estado final de nextPos
+        """
+        for numero, valor in self.nextPosDict.items():
+            if len(valor) == 0:
+                return numero
 
-        Args:
-            newPosibleStateset (list): el set de estados en cuestion
+        return ""
+
+    def getAcceptingStatesAFD(self):
+        """Obtenemos estados de aceptacion del AFD
 
         Returns:
-            bool: respuesta de existencia
+            list: los estados de aceptacion del afd
         """
-        for id,node in self.AFDResult.items():
-            if(newPosibleStateset == node.getStates()):
-                return True
-        return False
+        arrayValores = []
+        for valor in self.resultAFDArray:
+            if(str(self.getFinalStateId()) in valor[1]):
+                arrayValores.append(valor[0])
 
+        return arrayValores
 
-    def getAFDAcceptingStates(self):
-        '''
-        Se verifica si el estado de aceptacion del AFN se encuentra en alguno de los
-        sets de estados generados y asi saber que estado del AFD es de aceptacion.
+    def getStateNumberFromArray(self, array):
+        for valor in self.resultAFDArray:
+            if(valor[1] == array):
+                return valor[0]
 
-        - Ej. acceptingStatesAFN = 10 --> (a|b)*abb
-        '''
-        #Los Estados de aceptacion el AFN generado por thompson
-        afdAcceptingStates = {}
-        for id,node in self.AFDResult.items():
-            if(node.getIsAccepting()):
-                afdAcceptingStates[id] = node
-        return afdAcceptingStates
+    def isAnnullable(self, Nodes, character):
+        """Tabla magica para anulable de cada nodo en question
 
+        Args:
+            Nodes (list): array de nodos
+            character (str): el caracter en cuestion
 
-    def move(self,statesSet,transition):
-        '''
-        Funcion mover() que retorna los estados (del conjunto de estados proporcionado), que pasan 
-        por la transicion especificada. Ej. move(A,a) --> (a|b)*abb
+        Returns:
+            bool: es anulable o no
+        """
+        if(character == "ε"):
+            return True
+        else:
+            if(self.functions.isOperand(character)):
+                return False
+            elif (character == "|"):
+                nodeC1 = Nodes.pop()
+                nodeC2 = Nodes.pop()
+                annullableC1 = nodeC1.getAnnullable()
+                annullableC2 = nodeC2.getAnnullable()
 
-        Params:
-        - AFD: diccionario que representacion del AFD en question
-        - statesSet: Un conjunto de estados de un AFN Ej. A = [0,1,2,4,7]
-        - transition: transicion por la que pueden pasar algunos de los estados en A.
-        - return - [3,8]
-        '''
-        resultSetArray = []
+                return (annullableC1 or annullableC2)
+            elif(character == "."):
+                nodeC1 = Nodes.pop()
+                nodeC2 = Nodes.pop()
+                annullableC1 = nodeC1.getAnnullable()
+                annullableC2 = nodeC2.getAnnullable()
 
-        AFDResult = self.AFDResult
+                return (annullableC1 and annullableC2)
+            elif(character == "*"):
+                nodeC1 = Nodes.pop()
+                annullableC1 = nodeC1.getAnnullable()
 
-        for id, current_node in AFDResult.items():
-            if(statesSet[0] == id):
-                for rel in current_node.getRelations():
-                    if(rel.getToken() == transition):
-                        return [rel.getDestiny()]
-        return None
+                return (True)
 
-        '''for stateFromSet in statesSet:
-            for state, current_node in self.resultAFD.items():
-                for tran, s_set in current_node.items():
-                    if(state == stateFromSet and tran == transition):
-                        for id, state_val in resultAFD.items():
-                            if(s_set == state_val):
-                                resultSetArray.append(id)'''
+        return "FALSE"
 
-        return resultSetArray
+    def firstPos(self, Nodes, character):
+        """Tabla magica para firstPos de un nodo en cuestion
 
+        Args:
+            Nodes (list): array de nodos
+            character (str): el caracter en cuestion
 
-    def simDirectAFD(self):
-        '''
-        Funcion para simular un AFD 
-        '''
+        Returns:
+            list: los estados pertenecientes a firstPos del nodo en cuestion
+        """
+        if(character == "ε"):
+            return ""
+        else:
+            if(self.functions.isOperand(character)):
+                nodeC1 = Nodes.pop()
+                nodeC1Id = nodeC1.getNodeId()
+                return [nodeC1Id]
+            elif (character == "|"):
+                nodeC1 = Nodes.pop()
+                nodeC2 = Nodes.pop()
+                firstPosC1 = nodeC1.getFirstPos()
+                firstPosC2 = nodeC2.getFirstPos()
+                if(firstPosC1 == ""):
+                    firstPosC1 = []
+                if(firstPosC2 == ""):
+                    firstPosC2 = []
+                arrayFinalOr = firstPosC1+firstPosC2
+                arrayFinalOr = list(dict.fromkeys(arrayFinalOr))
+                arrayFinalOr.sort()
 
-        print('\n Simulando AFD con la cadena a evaluar... ')
+                return arrayFinalOr
+            elif(character == "."):
+                nodeC1 = Nodes.pop()
+                nodeC2 = Nodes.pop()
+                annullableC1 = nodeC1.getAnnullable()
+                firstPosC1 = nodeC1.getFirstPos()
+                firstPosC2 = nodeC2.getFirstPos()
+                if(firstPosC1 == ""):
+                    firstPosC1 = []
+                if(firstPosC2 == ""):
+                    firstPosC2 = []
+                if(annullableC1):
+                    arrayFinalAND = firstPosC1+firstPosC2
+                else:
+                    arrayFinalAND = firstPosC1
 
+                arrayFinalAND = list(dict.fromkeys(arrayFinalAND))
+                arrayFinalAND.sort()
+
+                return arrayFinalAND
+            elif(character == "*"):
+                nodeC1 = Nodes.pop()
+                firstPosC1 = nodeC1.getFirstPos()
+                if(firstPosC1 == ""):
+                    firstPosC1 = []
+                arrayFinalKleene = firstPosC1
+                arrayFinalKleene = list(dict.fromkeys(arrayFinalKleene))
+                arrayFinalKleene.sort()
+
+                return arrayFinalKleene
+        return "FALSE"
+
+    def lastPos(self, Nodes, character):
+        """Tabla magica para lastPos de un nodo en cuestion
+
+        Args:
+            Nodes (list): array de nodos
+            character (str): el caracter en cuestion
+
+        Returns:
+            list: los estados pertenecientes a lastPos del nodo en cuestion
+        """
+        if(character == "ε"):
+            return ""
+        else:
+            # si es un character, retornamos el mismo id, esa es su primera pos
+            if(self.functions.isOperand(character)):
+                nodeC1 = Nodes.pop()
+                nodeC1Id = nodeC1.getNodeId()
+                return [nodeC1Id]
+            elif (character == "|"):
+                nodeC1 = Nodes.pop()
+                nodeC2 = Nodes.pop()
+                lastPosC1 = nodeC1.getLastPos()
+                lastPosC2 = nodeC2.getLastPos()
+                if(lastPosC1 == ""):
+                    lastPosC1 = []
+                if(lastPosC2 == ""):
+                    lastPosC2 = []
+                arrayFinalOr = lastPosC1+lastPosC2
+                arrayFinalOr = list(dict.fromkeys(arrayFinalOr))
+                arrayFinalOr.sort()
+
+                return arrayFinalOr
+            elif(character == "."):
+                nodeC1 = Nodes.pop()
+                nodeC2 = Nodes.pop()
+                annullableC2 = nodeC2.getAnnullable()
+                lastPosC1 = nodeC1.getLastPos()
+                lastPosC2 = nodeC2.getLastPos()
+                if(lastPosC1 == ""):
+                    lastPosC1 = []
+                if(lastPosC2 == ""):
+                    lastPosC2 = []
+                if(annullableC2):
+                    arrayFinalAND = lastPosC1+lastPosC2
+                else:
+                    arrayFinalAND = lastPosC2
+
+                arrayFinalAND = list(dict.fromkeys(arrayFinalAND))
+                arrayFinalAND.sort()
+
+                return arrayFinalAND
+            elif(character == "*"):
+                nodeC1 = Nodes.pop()
+                lastPosC1 = nodeC1.getLastPos()
+                if(lastPosC1 == ""):
+                    lastPosC1 = []
+                arrayFinalKleene = lastPosC1
+                arrayFinalKleene = list(dict.fromkeys(arrayFinalKleene))
+                arrayFinalKleene.sort()
+
+                return arrayFinalKleene
+        return "FALSE"
+
+    def nextPos(self, Nodes, character):
+        """Tabla magica para nextPos(followPos) de un nodo en cuestion
+
+        Args:
+            Nodes (list): array de nodos
+            character (str): el caracter en cuestion
+
+        Returns:
+            list: los estados pertenecientes a nextPos del nodo en cuestion
+        """
+        # si es character, retorna el mismo id, esa es su primera pos
+        if(character == "."):
+            nodeC1 = Nodes.pop()
+            nodeC2 = Nodes.pop()
+
+            lastPosC1 = nodeC1.getLastPos()
+            firstPosC2 = nodeC2.getFirstPos()
+            if(firstPosC2 == ""):
+                firstPosC2 = []
+            if(lastPosC1 == ""):
+                lastPosC1 = []
+
+            arrayTemporal = []
+            for x in lastPosC1:
+                arrayTemporal = self.nextPosDict[int(x)]
+                arrayTemporal = arrayTemporal+firstPosC2
+                arrayTemporal = list(dict.fromkeys(arrayTemporal))
+                arrayTemporal.sort()
+                self.nextPosDict[int(x)] = arrayTemporal
+        if(character == "*"):
+            nodeC1 = Nodes.pop()
+            lastPosC1 = nodeC1.getLastPos()
+            firstPosC1 = nodeC1.getFirstPos()
+            if(lastPosC1 == ""):
+                lastPosC1 = []
+            if(firstPosC1 == ""):
+                firstPosC1 = []
+            for x in lastPosC1:
+                arrayTemporal = self.nextPosDict[int(x)]
+                arrayTemporal = arrayTemporal+firstPosC1
+                arrayTemporal = list(dict.fromkeys(arrayTemporal))
+                arrayTemporal.sort()
+                self.nextPosDict[int(x)] = arrayTemporal
+
+    def simAFD(self):
+        """Simulacion del AFD de resultado
+        """
         start_time = time.perf_counter()
-        F = self.getAFDAcceptingStates()
         s = [0]
-        for token in self.chain:
-            if(s == None):
-                break
-            else:
-                s = self.move(s,token)
+        for x in self.chain:
+            s = self.move(s, x)
+        end_time = time.perf_counter()
+        lastId = self.getAcceptingStatesAFD()
 
-        accepted = False
-        for accepting_state in F.keys():
-            if(s[0] == accepting_state):
-                accepted = True
-                break
+        if(len(s) > 0):
+            if(s[0] in lastId):
+                print('-------------------------------------------------')
+                print('La cadena '+self.chain+' fue aceptada por el AFD.')
+                end_time = time.perf_counter() 
+                total_time = end_time-start_time
+                print('Tiempo transcurrido: '+str(total_time))
+                print('-------------------------------------------------')
             else:
-                accepted = False
-
-        if(accepted):
-            print('-------------------------------------------------')
-            print('La cadena '+self.chain+' fue aceptada por el AFD.')
-            end_time = time.perf_counter() 
-            total_time = end_time-start_time
-            print('Tiempo transcurrido: '+str(total_time))
-            print('-------------------------------------------------')
+                print('-------------------------------------------------')
+                print('La cadena '+self.chain+' NO fue aceptada por el AFD.')
+                end_time = time.perf_counter()
+                total_time = end_time-start_time
+                print('Tiempo transcurrido: '+str(total_time))
+                print('-------------------------------------------------')
         else:
             print('-------------------------------------------------')
             print('La cadena '+self.chain+' NO fue aceptada por el AFD.')
@@ -412,61 +315,179 @@ class DirectAFD:
             total_time = end_time-start_time
             print('Tiempo transcurrido: '+str(total_time))
             print('-------------------------------------------------')
-        return 0
 
+    def move(self, estado, character):
+        """Representacion de la funcion mover en la implementacion
+        """
+        arrayEvaluar = self.resultAFDArray
+        arraymove = []
+        for states in estado:
+            for x in arrayEvaluar:
+                if(x[2] == character and len(x[3]) > 0 and states == x[0]):
+                    nextState = self.getStateNumberFromArray(x[3])
+                    if(nextState not in arraymove):
+                        arraymove.append(nextState)
 
-    def getAFDRelations(self):
-        '''
-        Funcion que retorna las relaciones de un afn
-        '''
-        rels = []
-        for id, node in self.AFDResult.items():
-            node_rels = node.getRelations()
-            if(len(node_rels) > 0):
-                rels.append(node_rels)
-        return rels
+        return arraymove
 
+    def drawAFD(self):
+        """Para la representacion grafica del afd en cuestion
+        """
+        drawArray = self.resultAFDArray
+        lastId = self.getAcceptingStatesAFD()
 
-    def drawDirectAFD(self, filename='direct-afd'):
-        print('Dibujando representacion del AFD Directo... \n')
+        filename='direct-afd'
         file_name = 'graphs-direct/'+filename
-        dot = Digraph(comment=filename, format='png')
+        dot = Digraph('finite_state_machine',comment=filename, format="png")
         dot.attr(rankdir='LR', size='8,8')
         dot.attr('node', style='filled',color='plum2') #,color='lightgrey'
 
-        acceptingStates = self.getAFDAcceptingStates()
+        # se agrega el nodo de aceptacion
         dot.attr('node', shape='doublecircle')
-        for id,node in acceptingStates.items():
-            dot.node(str(id))
-
+        for x in lastId:
+           dot.node(str(x))
         dot.attr('node', shape='circle')
-        afdRelations = self.getAFDRelations()
-
-        for rels in afdRelations:
-            if(len(rels) > 0):
-                if(len(rels) > 1):
-                    for rel in rels:
-                        dot.edge(str(rel.getOrigin()), str(rel.getDestiny()), label=str(rel.getToken()))
-                else:
-                    rel = rels.pop()
-                    dot.edge(str(rel.getOrigin()), str(rel.getDestiny()), label=str(rel.getToken()))
-
+        for x in drawArray:
+            if(len(x[1]) > 0 and len(x[3]) > 0):
+                estado1 = self.getStateNumberFromArray(x[1])
+                esatdo2 = self.getStateNumberFromArray(x[3])
+                dot.edge(str(estado1), str(esatdo2), x[2])
         dot.attr(label=r'\n'+filename, fontsize='20')
         dot.render(filename=file_name, view=True)
-        #dot.view()
 
     def generateDirectAFD(self):
-        """Funcion centralizadora de las funciones necesarias para la generacion de un AFD a partir de una
-        expresion regular.
+        """Funcion que centraliza el calculo de anulable, firstPos, lastPos y nextPost(followPos) 
+        para obtener el AFD de resultado.
         """
-        #se parsea el postfix para calcular anulable, firstpos y lastpos
-        self.posfixParse()
-        #se construye nextpos a partir de los calculos anteriores
-        self.buildNextPos()
-        #se construye el afd a partir de nextpos
-        self.nextPosToAFD()
-        #se simula el afd con la cadena ingresada
-        self.simDirectAFD()
-        #se dibuja el afd
-        self.drawDirectAFD()
-        
+        # acá se construye el arbol
+        for postfixValue in self.expresionPostfix:
+            if(self.functions.isOperand(postfixValue)):  # * si es una letra
+                if(postfixValue == "ε"):  # si es un 'ε' entonces no se le agrega numeración
+                    nodeFirstPos = ""
+                    nodeLastPos = ""
+                    node = NodeD()
+                    node.setCaracterNodo(postfixValue)
+                    node.setNodoId("")
+
+                    node.setAnnullable(self.isAnnullable(node, postfixValue))
+                    nodeFirstPos = [node]
+                    nodeLastPos = [node]
+                    node.setFirstPos(self.firstPos(nodeFirstPos, postfixValue))
+                    node.setLastPos(self.lastPos(nodeLastPos, postfixValue))
+                    self.resultAFD[self.globalCounter2] = node
+                    self.globalCounter2 += 1
+                    self.nodesArray.append(node)  # agregamos el nodo
+                else:  # cualquier otra letra INCLUYENDO el # lleva numeracion
+                    node = NodeD()
+                    nodeFirstPos = ""
+                    nodeLastPos = ""
+                    node.setCaracterNodo(postfixValue)
+                    node.setNodoId(str(self.globalCounter))
+                    self.nextPosDict[self.globalCounter] = []
+                    self.globalCounter += 1  # aumentamos el counter global
+                    nodeFirstPos = [node]
+                    nodeLastPos = [node]
+                    node.setAnnullable(self.isAnnullable(node, postfixValue))
+                    node.setFirstPos(self.firstPos(nodeFirstPos, postfixValue))
+                    node.setLastPos(self.lastPos(nodeLastPos, postfixValue))
+                    self.resultAFD[self.globalCounter2] = node
+
+                    self.globalCounter2 += 1
+                    self.nodesArray.append(node)  # agregamos el nodo
+            # el OR NO tiene numero
+            elif(postfixValue == "|"):  
+                nodeOrAnulable = ""
+                nodeOrfirstPos = ""
+                nodeOrlastPos = ""
+                nodeOr = NodeD()
+                nodeOr.setCaracterNodo(postfixValue)
+                nodeOr.setNodoId("")
+                nodeb = self.nodesArray.pop()
+                nodea = self.nodesArray.pop()
+                nodeOrAnulable = [nodeb, nodea]
+                nodeOrfirstPos = [nodeb, nodea]
+                nodeOrlastPos = [nodeb, nodea]
+                nodeOr.setAnnullable(self.isAnnullable(nodeOrAnulable, postfixValue))
+                nodeOr.setFirstPos(self.firstPos(nodeOrfirstPos, postfixValue))
+                nodeOr.setLastPos(self.lastPos(nodeOrlastPos, postfixValue))
+                # agregar al diccionario AFD de resultado global
+                self.resultAFD[self.globalCounter2] = nodeOr
+                self.globalCounter2 += 1
+                self.nodesArray.append(nodeOr)  # se agrega el nodo en cuestion
+
+            # el AND NO tiene numero
+            elif(postfixValue == "."):  
+                nodeAndAnulable = ""
+                nodeAndfirstPos = ""
+                nodeAndlastPos = ""
+                nodeAndSiguientePos = ""
+                nodeAnd = NodeD()
+                nodeAnd.setCaracterNodo(postfixValue)
+                nodeAnd.setNodoId("")
+                nodeb = self.nodesArray.pop()
+                nodea = self.nodesArray.pop()
+                nodeAndAnulable = [nodeb, nodea]
+                nodeAndfirstPos = [nodeb, nodea]
+                nodeAndlastPos = [nodeb, nodea]
+                nodeAndSiguientePos = [nodeb, nodea]
+                nodeAnd.setAnnullable(self.isAnnullable(nodeAndAnulable, postfixValue))
+                nodeAnd.setFirstPos(self.firstPos(nodeAndfirstPos, postfixValue))
+                nodeAnd.setLastPos(self.lastPos(nodeAndlastPos, postfixValue))
+                self.nextPos(nodeAndSiguientePos, postfixValue)
+                # agregar al diccionario AFD de resultado global
+                self.resultAFD[self.globalCounter2] = nodeAnd
+                self.globalCounter2 += 1
+                self.nodesArray.append(nodeAnd)  # se agrega el nodo en cuestion
+
+            # el * NO tiene numero
+            elif(postfixValue == "*"):  
+                nodeKleeneAnulable = ""
+                nodeKleenefirstPos = ""
+                nodeKleenelastPos = ""
+                nodeKleeneSiguientePos = ""
+                nodeKleene = NodeD()
+                nodeKleene.setCaracterNodo(postfixValue)
+                nodeKleene.setNodoId("")
+                node = self.nodesArray.pop()
+                nodeKleeneAnulable = [node]
+                nodeKleenefirstPos = [node]
+                nodeKleenelastPos = [node]
+                nodeKleeneSiguientePos = [node]
+                nodeKleene.setAnnullable(self.isAnnullable(nodeKleeneAnulable, postfixValue))
+                nodeKleene.setFirstPos(self.firstPos(nodeKleenefirstPos, postfixValue))
+                nodeKleene.setLastPos(self.lastPos(nodeKleenelastPos, postfixValue))
+                self.nextPos(nodeKleeneSiguientePos, postfixValue)
+                # agregar al diccionario AFD de resultado global
+                self.resultAFD[self.globalCounter2] = nodeKleene
+                self.globalCounter2 += 1
+                self.nodesArray.append(nodeKleene) # se agrega el nodo en cuestion
+
+        # self.nodesArray ----> root node
+        # self.resultAFD contiene el ARBOL
+        # print(self.tokens)
+        # print(self.getPosFromCharacter('b'))
+        rootNode = self.nodesArray.pop()
+        initStates = rootNode.getFirstPos()
+        self.DStates.append(initStates)
+        self.DStates2.append(initStates)
+        counter = -1
+
+        while len(self.DStates) > 0:
+            internalState = self.DStates.pop()
+            counter += 1
+            for tokenn in self.tokens:
+                if(tokenn != str("ε")):
+                    tokenPos = self.getPosFromCharacter(tokenn)
+                    nextPosID = []
+                    for id in tokenPos:
+                        if(id in internalState):
+                            nextPosID = nextPosID + self.nextPosDict[int(id)]
+                    if(not(nextPosID in self.DStates2)):
+                        self.DStates.append(nextPosID)
+                        self.DStates2.append(nextPosID)
+                        self.resultAFDArray.append([counter, internalState, tokenn, nextPosID])
+                    elif(len(internalState) > 0):
+                        self.resultAFDArray.append([counter, internalState, tokenn, nextPosID])
+
+        self.drawAFD()
+        self.simAFD()

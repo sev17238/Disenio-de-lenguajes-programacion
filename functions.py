@@ -84,7 +84,7 @@ def getRegExUniqueTokens(postfix_regex):
     '''
     Funcion que obtiene los tokens unicos o el lenguaje de una expresion regular en formato postfix.
     '''
-    ops = '*|.'
+    ops = '*|.#'
     tokens = []
     for i in range(len(postfix_regex)):
         token = postfix_regex[i]
@@ -109,3 +109,26 @@ def representsInt(st):
             return True
         except ValueError:
             return False
+
+
+class functions:
+    # A utility function to check is the given character
+    # is operand
+
+    def isOperand(self,character):
+        """
+        REtorna TRUE si el caracter ingresado es un alfanumerico, FALSE de lo contrario
+        *@param ch: el caracter a ser probado
+        """
+        if character.isalnum() or character == "ε" or character == "#":
+            return True
+        return False
+
+    def is_op(self, a):
+        """
+        Testeamos si el caracter de entrada es un operando
+        *@param a: caracter a ser probado
+        """
+        if a == '+' or a == '.' or a == '*' or a == '?' or a == '|':
+            return True
+        return False

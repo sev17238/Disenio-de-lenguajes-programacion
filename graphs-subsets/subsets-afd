@@ -3,17 +3,26 @@ digraph {
 	rankdir=LR size="8,8"
 	node [color=lightpink style=filled]
 	node [shape=doublecircle]
+	1
+	2
+	3
 	4
+	5
+	6
+	7
 	node [shape=circle]
-	1 -> 3 [label=b]
-	1 -> 1 [label=a]
-	0 -> 2 [label=b]
+	1 -> 4 [label="ε"]
+	1 -> 2 [label=a]
+	1 -> 3 [label=c]
 	0 -> 1 [label=a]
-	2 -> 1 [label=a]
-	2 -> 2 [label=b]
-	3 -> 4 [label=b]
-	3 -> 1 [label=a]
-	4 -> 1 [label=a]
-	4 -> 2 [label=b]
+	2 -> 2 [label=a]
+	2 -> 3 [label=c]
+	2 -> 4 [label="ε"]
+	4 -> 5 [label="ε"]
+	4 -> 2 [label=a]
+	4 -> 3 [label=c]
+	5 -> 6 [label="ε"]
+	5 -> 7 [label="ε"]
+	5 -> 3 [label=c]
 	fontsize=20 label="\nsubsets-afd"
 }
