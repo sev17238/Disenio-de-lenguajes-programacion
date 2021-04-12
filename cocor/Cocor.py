@@ -1,0 +1,99 @@
+######################################################
+# Diego Sevilla
+# 17238
+######################################################
+# Cocol.py
+######################################################
+
+#imports
+import os
+import sys
+from os.path import basename
+sys.path.append(".")
+
+
+#Clase de implementacion_________________________________________________
+class Cocor:
+    """Clase con definiciones varias de COCO/R
+    """
+    # Constructor de las variables
+    def __init__(self):
+
+        #definicion patrones base del vocabulario   
+        self.vocabulary = {
+            'ident' : "letter{letter|digit}.",
+            'number': "digit{digit}.",
+            'string': "'"' {anyButQuote} '"'.",
+            'char'  : "'\'' anyButApostrophe '\''."
+        }
+
+        self.charactersInFile = {}
+        self.keyWordsInFile = {}
+        self.tokensInFile = {}
+        #self.productionsInFile = {}
+
+    def readCFG(self):
+        here = os.path.dirname(os.path.abspath(__file__))
+        file_ = 'file.cfg'
+        filepath = os.path.join(here, file_)
+        header = ''
+
+        with open(filepath,'r') as fp:
+            line = fp.readline()
+            cnt = 1
+            while line:
+                line = line.rstrip()
+                if not(line.startswith('(.')) and len(line) > 0:
+                    
+                    if(line.startswith('CHARACTERS')):
+                        header = 'CHARACTERS'
+                    elif(line.startswith('KEYWORDS')):
+                        header = 'KEYWORDS'
+                    elif(line.startswith('TOKENS')):
+                        header = 'TOKENS'
+                    #elif('PRODUCTIONS' in currentLine):
+                    #    header = 'PRODUCTIONS'
+
+                    if('=' in line):
+                        
+                        arr_ = line.split('=')
+                        arr_[0] = arr_[0].replace(' ','')
+                        arr_[1] = arr_[1].replace(' ','')
+                        arr_[1] = arr_[1].replace('.','')
+                        if(header == 'CHARACTERS'):
+                            self.charactersInFile[arr_[0]] = arr_[1]
+                        elif(header == 'KEYWORDS'):
+                            self.keyWordsInFile[arr_[0]] = arr_[1]
+                        elif(header == 'TOKENS'):
+                            self.tokensInFile[arr_[0]] = arr_[1]
+                        #if(header == 'PRODUCTIONS'):
+                        #   self.productionsInFile[arr_[0]] = arr_[1]
+
+                #print("Line {}: {}".format(cnt, line.strip()))
+                line = fp.readline()
+
+                cnt += 1
+
+
+    def fileContents(self):
+        print(self.charactersInFile)
+        print(self.keyWordsInFile)
+        print(self.tokensInFile)
+
+
+
+
+
+
+#tests__________
+def main():
+    obj = Cocor()
+    obj.readCFG()
+    obj.fileContents()
+
+if __name__ == "__main__":
+    main()
+
+
+
+
