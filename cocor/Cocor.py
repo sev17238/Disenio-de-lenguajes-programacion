@@ -8,9 +8,9 @@
 #imports
 import os
 import sys
+sys.path.append(".")
 from os.path import basename
 from functions import functions
-sys.path.append(".")
 
 
 #Clase de implementacion_________________________________________________
@@ -75,10 +75,12 @@ class Cocor:
         self.tokensInFile = {}
         #self.productionsInFile = {}
 
+        self.test_patterns = []
+
         self.functions = functions()
 
 
-    def readCFG(self,file='file.cfg'):
+    def read_def_cfg(self,file='def_file.cfg'):
         here = os.path.dirname(os.path.abspath(__file__))
         file_ = file
         filepath = os.path.join(here, file_)
@@ -104,7 +106,7 @@ class Cocor:
                         
                         arr_ = line.split('=')
                         arr_[0] = arr_[0].replace(' ','')
-                        arr_[1] = arr_[1].replace(' ','')
+                        #arr_[1] = arr_[1].replace(' ','')
                         arr_[1] = arr_[1].replace('.','')
                         if(header == 'CHARACTERS'):
                             self.charactersInFile[arr_[0]] = arr_[1]
@@ -117,15 +119,29 @@ class Cocor:
 
                 #print("Line {}: {}".format(cnt, line.strip()))
                 line = fp.readline()
-
                 cnt += 1
+
+    def read_test_file(self,file='test_file.cfg'):
+        here = os.path.dirname(os.path.abspath(__file__))
+        file_ = file
+        filepath = os.path.join(here, file_)
+        with open(filepath,'r') as fp:
+            line = fp.readline()
+            while line:
+                line = line.rstrip()
+                for i in line.split(' '):
+                    if len(i) > 0:
+                        self.test_patterns.append(i)
+                line = fp.readline()
+                
 
 
     def fileContents(self):
         print(self.charactersInFile)
-        print(self.keyWordsInFile['while'])
+        print(self.keyWordsInFile)
         print(self.tokensInFile)
-        print("while")
+        
+        print(self.test_patterns)
 
     def parser(self):
         
@@ -139,7 +155,8 @@ class Cocor:
 #tests__________
 def main():
     obj = Cocor()
-    obj.readCFG()
+    obj.read_def_cfg()
+    obj.read_test_file()
     obj.fileContents()
 
 if __name__ == "__main__":
