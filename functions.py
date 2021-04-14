@@ -132,3 +132,11 @@ class functions:
         if a == '+' or a == '.' or a == '*' or a == '?' or a == '|':
             return True
         return False
+
+    def replace_all_non_alphabet_chars_string(self,currentString,type):
+        resultString = ''.join([s for s in currentString if s.isalpha()])
+        return resultString
+
+    def replace_all_non_digit_chars_string(self,currentString):
+        resultString = ''.join([s for s in currentString if s.isdigit()])
+        return resultString

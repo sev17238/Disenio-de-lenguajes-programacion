@@ -9,6 +9,7 @@
 import os
 import sys
 from os.path import basename
+from functions import functions
 sys.path.append(".")
 
 
@@ -20,11 +21,53 @@ class Cocor:
     def __init__(self):
 
         #definicion patrones base del vocabulario   
-        self.vocabulary = {
+        '''self.vocabulary = {
             'ident' : "letter{letter|digit}.",
             'number': "digit{digit}.",
             'string': "'"' {anyButQuote} '"'.",
             'char'  : "'\'' anyButApostrophe '\''."
+        }'''
+
+        self.keywords = {
+            # conditionals, iterators
+            "if":"if",
+            "elif":"elif",
+            "else":"else",
+            "while":"while",
+            "for":"for", 
+            # jumps, interuptions
+            "assert":"assert",
+            "break":"break",
+            "continue":"continue",
+            "except":"except",
+            "raise":"raise",
+            "finally":"finally",
+            "pass":"pass",
+            "with":"with", 
+            #shot keywords
+            "as":"as",
+            "in":"in",
+            "is":"is", 
+            #logical operators
+            "and":"and",
+            "or":"or",
+            "not":"not", 
+            #bools and None
+            "False":"False", 
+            "True":"True", 
+            "None":"None", 
+            #funcions and classes
+            "class":"class",
+            "def":"def",
+            "del":"del",
+            "from":"from",
+            "global":"global",
+            "nonlocal":"nonlocal",
+            "import":"import",
+            "return":"return",
+            #lambdas
+            "lambda":"lambda",
+            "yield":"yield",
         }
 
         self.charactersInFile = {}
@@ -32,9 +75,12 @@ class Cocor:
         self.tokensInFile = {}
         #self.productionsInFile = {}
 
-    def readCFG(self):
+        self.functions = functions()
+
+
+    def readCFG(self,file='file.cfg'):
         here = os.path.dirname(os.path.abspath(__file__))
-        file_ = 'file.cfg'
+        file_ = file
         filepath = os.path.join(here, file_)
         header = ''
 
@@ -51,7 +97,7 @@ class Cocor:
                         header = 'KEYWORDS'
                     elif(line.startswith('TOKENS')):
                         header = 'TOKENS'
-                    #elif('PRODUCTIONS' in currentLine):
+                    #elif(line.startswith('PRODUCTIONS')):
                     #    header = 'PRODUCTIONS'
 
                     if('=' in line):
@@ -77,8 +123,13 @@ class Cocor:
 
     def fileContents(self):
         print(self.charactersInFile)
-        print(self.keyWordsInFile)
+        print(self.keyWordsInFile['while'])
         print(self.tokensInFile)
+        print("while")
+
+    def parser(self):
+        
+        return 0
 
 
 
