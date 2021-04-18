@@ -110,10 +110,9 @@ def representsInt(st):
         except ValueError:
             return False
 
-
 class functions:
-    # A utility function to check is the given character
-    # is operand
+    """functions class
+    """
 
     def isOperand(self,character):
         """
