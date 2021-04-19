@@ -440,6 +440,11 @@ class Cocor:
                     l = 0
                     print('else')
 
+            expOpArray.insert(0,'(')
+            expOpArray.append(')')
+            expOpArray.append('~')
+            expOpArray.append('$')
+
             if(len(except_arr) == 0):
                 self.tokensReadyForPosFix[key] = expOpArray
             else:
@@ -449,9 +454,10 @@ class Cocor:
 
         print('')
 
-        #for key, exp in self.tokensReadyForPosFix.items():
-        #    self.tokensPosFixInFile[key] =  self.objToPostfix.infix_to_postfix(exp)
+        for key, exp in self.tokensReadyForPosFix.items():
+            self.tokensPosFixInFile[key] =  self.objToPostfix.infix_to_postfix(exp)
 
+        print('')
 
     def fileContents(self):
         self.cocorToP1Convention()
