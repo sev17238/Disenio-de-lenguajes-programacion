@@ -11,7 +11,7 @@ import sys
 sys.path.append(".")
 from os.path import basename
 from functions import functions
-
+from infix_postfix_related.InfixRegexToPostfixWords import InfixRegexToPostfixWords
 
 #Clase de implementacion_________________________________________________
 class Cocor:
@@ -19,14 +19,6 @@ class Cocor:
     """
     # Constructor de las variables
     def __init__(self):
-
-        #definicion patrones base del vocabulario   
-        '''self.vocabulary = {
-            'ident' : "letter{letter|digit}.",
-            'number': "digit{digit}.",
-            'string': "'"' {anyButQuote} '"'.",
-            'char'  : "'\'' anyButApostrophe '\''."
-        }'''
 
         self.keywords = {
             # conditionals, iterators
@@ -73,18 +65,23 @@ class Cocor:
         self.charactersInFile = {}
         self.keyWordsInFile = {}
         self.tokensInFile = {}
-        #self.productionsInFile = {}
-
         self.tokensConvertionInFile = {}
+        self.tokensReadyForPosFix = {}
+        self.tokensPosFixInFile = {}
+        #self.productionsInFile = {}
 
         self.test_patterns = []
 
         self.functions = functions()
+        self.objToPostfix = InfixRegexToPostfixWords()
 
-
+    def getTokens(self):
+        return self.tokensConvertionInFile
 
 
     def read_def_cfg(self,file='def_file.cfg'):
+        """Funcion para leer el archivo con la definicion de tokens
+        """
         here = os.path.dirname(os.path.abspath(__file__))
         file_ = file
         filepath = os.path.join(here, file_)
@@ -125,6 +122,8 @@ class Cocor:
                 cnt += 1
 
     def read_test_file(self,file='test_file.cfg'):
+        """Funcion para leer el archivo de prueba y almacenar sus contenidos.
+        """
         here = os.path.dirname(os.path.abspath(__file__))
         file_ = file
         filepath = os.path.join(here, file_)
@@ -137,183 +136,331 @@ class Cocor:
                         self.test_patterns.append(i)
                 line = fp.readline()
 
-    def fileContents(self):
-        print(self.charactersInFile)
-        print(self.keyWordsInFile)
-        print(self.tokensInFile)
-        self.cocorToP1Convention()
-        print(self.tokensConvertionInFile)
-        
-        print(self.test_patterns)
 
+    def intoBraces(self,tokens_exp,c,expArray):
+        """Recorre los contenidos dentro de { } y retorna el valor de conversion ()*. 
+        Puede tener recursion pero se asume que no habran mas {} dentro de la expresion.
 
-    def intoBraces(self,token_def,c,expArray):
+        Args:
+            tokens_exp (str): cadena con tokens
+            c (int): contador externo
+            expArray (list): lista con todos los tokens encontrados en tokens_exp
+
+        Returns:
+            list: expArray actualizado
+            int: el contador actualizado
+        """
         word_set = ['(']
         c += 1
-        currentChar = (token_def[c])
-        while (c < len(token_def) and (token_def[c].isalpha() or token_def[c] in "|}{'\"") ):
-            if token_def[c] == '}':
+        currentChar = (tokens_exp[c])
+        while (c < len(tokens_exp) and (tokens_exp[c].isalpha() or tokens_exp[c] in "|}{'\"") ):
+            if tokens_exp[c] == '}':
                 word_set.append(')*')
                 c += 1
                 expArray.append(''.join(word_set))
                 break
-            elif token_def[c] == '{':
-                expArray, c = self.intoBraces(token_def,c,expArray)
+            elif tokens_exp[c] == '{':
+                expArray, c = self.intoBraces(tokens_exp,c,expArray)
             else:
-                word_set.append(token_def[c])
+                word_set.append(tokens_exp[c])
                 c += 1
         return expArray,c
 
-    def intoBrackets(self,token_def,c,expArray):
+    def intoBrackets(self,tokens_exp,c,expArray):
+        """Recorre los contenidos dentro de [ ] y retorna el valor. 
+        Hay recursion ya que pueden haber mas [ ] dentro.
+
+        Args:
+            tokens_exp (str): cadena con tokens
+            c (int): contador externo
+            expArray (list): lista con todos los tokens encontrados en tokens_exp
+
+        Returns:
+            list: expArray actualizado
+            int: el contador actualizado
+        """
         word_set = ['(']
         expArray.append('(')
         c += 1
-        currentChar = (token_def[c])
-        while (c < len(token_def) and (token_def[c].isalpha() or token_def[c] in "|][}{'\"") ):
-            currentChar = (token_def[c])
-            if token_def[c] == ']':
-                word_set.append(')?')
+        currentChar = (tokens_exp[c])
+        while (c < len(tokens_exp) and (tokens_exp[c].isalpha() or tokens_exp[c] in "|][}{'\"") ):
+            currentChar = (tokens_exp[c])
+            if tokens_exp[c] == ']':
+                word_set.append(')|ε')
                 openp = 0
                 closep = 0
                 for b in expArray:
-                    if(')?' in b):
+                    if(')|ε' in b):
                         closep +=1
                     elif(b == '('):
                         openp += 1
 
-                if(''.join(word_set) == "()?" and (closep != openp-1)):
+                if(''.join(word_set) == "()|ε" and (closep != openp-1)):
                     exp = expArray.pop()
-                    exp = exp + ')?'
+                    exp = exp + ')|ε'
                     expArray.append(exp)
-                elif(''.join(word_set) == "()?" and (closep == openp-1)):
-                    expArray.append(')?')
+                elif(''.join(word_set) == "()|ε" and (closep == openp-1)):
+                    expArray.append(')|ε')
                 else: 
                     expArray.append(''.join(word_set))
                 c += 1
                 break
-            elif token_def[c] == '[':
-                expArray, c = self.intoBrackets(token_def,c,expArray)
-            elif token_def[c] == '{':
-                expArray, c = self.intoBraces(token_def,c,expArray)
-            elif token_def[c] in "'\"":
-                expArray, c = self.intoQuotationsApostrophes(token_def,c,expArray)
-            elif token_def[c].isalpha():
-                expArray, c = self.alphaNumericIterator(token_def,c,expArray)
+            elif tokens_exp[c] == '[':
+                expArray, c = self.intoBrackets(tokens_exp,c,expArray)
+            elif tokens_exp[c] == '{':
+                expArray, c = self.intoBraces(tokens_exp,c,expArray)
+            elif tokens_exp[c] in "'\"":
+                expArray, c = self.intoQuotationsApostrophes(tokens_exp,c,expArray)
+            elif tokens_exp[c].isalpha():
+                expArray, c = self.alphaNumericIterator(tokens_exp,c,expArray)
             else:
-                word_set.append(token_def[c])
+                word_set.append(tokens_exp[c])
                 c += 1
         return expArray,c
 
-    def intoParenthesis(self,token_def,c,expArray):
+    def intoParenthesis(self,tokens_exp,c,expArray):
+        """Recorre los contenidos dentro de ( ) y retorna el valor. 
+        Hay recursion ya que pueden haber mas ( ) dentro.
+
+        Args:
+            tokens_exp (str): cadena con tokens
+            c (int): contador externo
+            expArray (list): lista con todos los tokens encontrados en tokens_exp
+
+        Returns:
+            list: expArray actualizado
+            int: el contador actualizado
+        """
         word_set = ['(']
         c += 1
-        currentChar = (token_def[c])
-        while (c < len(token_def) and (token_def[c].isalpha() or token_def[c] in "|)('\"") ):
-            currentChar = (token_def[c])
-            if token_def[c] == ')':
-                word_set.append(token_def[c])
+        currentChar = (tokens_exp[c])
+        while (c < len(tokens_exp) and (tokens_exp[c].isalpha() or tokens_exp[c] in "|)('\"") ):
+            currentChar = (tokens_exp[c])
+            if tokens_exp[c] == ')':
+                word_set.append(tokens_exp[c])
                 c += 1
                 expArray.append(''.join(word_set))
                 break
-            elif token_def[c] == '(':
-                expArray, c = self.intoParenthesis(token_def,c,expArray)
+            elif tokens_exp[c] == '(':
+                expArray, c = self.intoParenthesis(tokens_exp,c,expArray)
             else:
-                word_set.append(token_def[c])
+                word_set.append(tokens_exp[c])
                 c += 1
         return expArray,c
 
-    def intoQuotationsApostrophes(self,token_def,c,expArray):
-        if token_def[c] == '"':
+    def intoQuotationsApostrophes(self,tokens_exp,c,expArray):
+        """Recorre los contenidos dentro de ' ' o " " considerando | dentro y retorna el valor.
+
+        Args:
+            tokens_exp (str): cadena con tokens
+            c (int): contador externo
+            expArray (list): lista con todos los tokens encontrados en tokens_exp
+
+        Returns:
+            list: expArray actualizado
+            int: el contador actualizado
+        """
+        if tokens_exp[c] == '"':
             q = '"'
-        elif token_def[c] == "'":
+        elif tokens_exp[c] == "'":
             q = "'"
         word_set = []
         c += 1
         word_set.append(q)
-        while c < len(token_def):
-            if token_def[c+1] == "|":
-                if token_def[c+2] in "'\"":
-                    word_set.append(token_def[c]) #se inserta el '
-                    word_set.append(token_def[c+1]) #se inserta el |
-                    word_set.append(token_def[c+2]) #se inserta el proximo '
+        while c < len(tokens_exp):
+            if tokens_exp[c+1] == "|":
+                if tokens_exp[c+2] in "'\"":
+                    word_set.append(tokens_exp[c]) #se inserta el '
+                    word_set.append(tokens_exp[c+1]) #se inserta el |
+                    word_set.append(tokens_exp[c+2]) #se inserta el proximo '
                     c += 3
                 else:
-                    word_set.append(token_def[c])
+                    word_set.append(tokens_exp[c])
                     c += 1
                 #continue
-            elif token_def[c] == q:
-                word_set.append(token_def[c])
+            elif tokens_exp[c] == q:
+                word_set.append(tokens_exp[c])
                 c += 1
                 break
             else:
-                word_set.append(token_def[c])
+                word_set.append(tokens_exp[c])
                 c += 1
         expArray.append(''.join(word_set))
         return expArray, c 
 
-    def alphaNumericIterator(self,token_def,c,expArray):
+    def intoQuotationsApostrophesV2(self,tokens_exp,c,expArray):
+        """Recorre los contenidos dentro de ' ' o " " sin cosidrerar | y retorna el valor.
+
+        Args:
+            tokens_exp (str): cadena con tokens
+            c (int): contador externo
+            expArray (list): lista con todos los tokens encontrados en tokens_exp
+
+        Returns:
+            list: expArray actualizado
+            int: el contador actualizado
+        """
+        if tokens_exp[c] == '"':
+            q = '"'
+        elif tokens_exp[c] == "'":
+            q = "'"
         word_set = []
-        while (c < len(token_def) and (token_def[c].isalpha() or token_def[c] == "|")):
-            word_set.append(token_def[c])
-            c += 1
+        c += 1
+        word_set.append(q)
+        while c < len(tokens_exp):
+            if tokens_exp[c] == q:
+                word_set.append(tokens_exp[c])
+                c += 1
+                break
+            else:
+                word_set.append(tokens_exp[c])
+                c += 1
+        expArray.append(''.join(word_set))
+        return expArray, c 
+    
+    def alphaNumericIterator(self,tokens_exp,c,expArray,considerOr=True):
+        """Recorre una cadena de letras tomando en cuenta | y la retorna.
+
+        Args:
+            tokens_exp (str): cadena con tokens
+            c (int): contador externo
+            expArray (list): lista con todos los tokens encontrados en tokens_exp
+
+        Returns:
+            list: expArray actualizado
+            int: el contador actualizado
+        """
+        word_set = []
+        if considerOr:
+            while (c < len(tokens_exp) and (tokens_exp[c].isalpha() or tokens_exp[c] == "|")):
+                word_set.append(tokens_exp[c])
+                c += 1
+        else:
+            while (c < len(tokens_exp) and tokens_exp[c].isalpha()):
+                word_set.append(tokens_exp[c])
+                c += 1
         word = ''.join(word_set)
-        if (word == 'EXCEPT' or word == 'KEYWORDS'):
-            word_set.insert(0,' ') 
+        #if (word == 'EXCEPT' or word == 'KEYWORDS'):
+        #    word_set.insert(0,' ') 
         expArray.append(''.join(word_set))
         return expArray, c
 
 
     def cocorToP1Convention(self):
-        """funcion para hacer conversions como: 
+        """funcion para acoplar las expresiones regulares al proyecto 1 haciendo conversiones como: 
 
         - kleene closure
             - digit{digit} = digit digit *
             - {} = * (0 o mas)  -->  r*
 
         - positive closure
-            - [digit] = digit? = digit|e
-            - [] = ? (cero o una instancia)  -->  r? = r|e
+            - [digit] = digit? = digit|ε
+            - [] = ? (cero o una instancia)  -->  r? = r|ε
+
+        - concatenacion
+            - '~' = operador explicito para concatenacion
         """
         closures = []
         expArray = []
-        for key, token_def in self.tokensInFile.items():
+        for key, tokens_exp in self.tokensInFile.items():
             c = 0
-            while c < len(token_def):
-                currentChar = token_def[c]
-                if token_def[c] == " ":
+            while c < len(tokens_exp):
+                currentChar = tokens_exp[c]
+                if tokens_exp[c] == " ":
                     c += 1
                     continue
-                elif(token_def[c] == "{"):
-                    expArray, c = self.intoBraces(token_def,c,expArray)
-                elif(token_def[c] == "("):
-                    expArray, c = self.intoParenthesis(token_def,c,expArray)
-                elif(token_def[c] == "["):
-                    expArray, c = self.intoBrackets(token_def,c,expArray)
-                elif(token_def[c].isalpha() or c == '|'):
-                    expArray, c = self.alphaNumericIterator(token_def,c,expArray)
-                    #c -= 1
-                elif(token_def[c] in "'\""):
-                    expArray, c = self.intoQuotationsApostrophes(token_def,c,expArray)
-                    #c -= 1
-                elif(token_def[c] in "})]"):
+                elif(tokens_exp[c] == "{"):
+                    expArray, c = self.intoBraces(tokens_exp,c,expArray)
+                elif(tokens_exp[c] == "("):
+                    expArray, c = self.intoParenthesis(tokens_exp,c,expArray)
+                elif(tokens_exp[c] == "["):
+                    expArray, c = self.intoBrackets(tokens_exp,c,expArray)
+                elif(tokens_exp[c].isalpha() or c == '|'):
+                    expArray, c = self.alphaNumericIterator(tokens_exp,c,expArray)
+                elif(tokens_exp[c] in "'\""):
+                    expArray, c = self.intoQuotationsApostrophes(tokens_exp,c,expArray)
+                elif(tokens_exp[c] in "})]"):
                     print('Revisar cerraduras de apertura en la expresion')
                 else:
                     l = 0
+                    print('else')
 
-                #c -= 1
+            finalExpArray = []
+            c = 0
+            #for exp in expArray:
+            if('(' in expArray):
+                while (c < len(expArray)):
+                    if(expArray[c] == '('):
+                        exp = expArray[c] + expArray[c+1]
+                        finalExpArray.append(exp)
+                        c += 2
+                    else:
+                        finalExpArray.append(expArray[c])
+                        c += 1
+                #finalExpArray[0] = '('+expArray[0]
+                #if(expArray[len(expArray)-1] == ')|ε'):
+                #    closure = finalExpArray.pop()
+                #    token_before = finalExpArray.pop()
+                #    joining = token_before+closure+')'
+                #    finalExpArray.append(joining)
+                #    finalExpArray.append('#')
 
-            self.tokensConvertionInFile[key] = ''.join(expArray)
+                self.tokensConvertionInFile[key] = '~'.join(finalExpArray)
+            else:
+                self.tokensConvertionInFile[key] = '~'.join(expArray)
             expArray = []
 
-        return 0
 
-    def parser(self):
-        
-        return 0
+    def tokensToPostfix(self):
+        expOpArray = []
+        except_arr = []
+        for key, tokens_exp in self.tokensConvertionInFile.items():
+            c = 0
+            if ('EXCEPT' in tokens_exp or 'KEYWORDS' in tokens_exp):
+                except_arr.append('EXCEPT KEYWORDS')
+                numToRemove = (len('EXCEPT')+len('KEYWORDS')+2)
+                numCharacters = len(tokens_exp)-numToRemove
+                tokens_exp_new = tokens_exp[:numCharacters]
+            else:
+                tokens_exp_new = tokens_exp
+
+            while c < len(tokens_exp_new):
+                currentChar = tokens_exp_new[c]
+                if tokens_exp_new[c] == " ":
+                    c += 1
+                    continue
+                elif(tokens_exp_new[c] in "~*|)("):
+                    expOpArray.append(tokens_exp_new[c])
+                    c += 1
+                elif(tokens_exp_new[c].isalpha()):
+                    expOpArray, c = self.alphaNumericIterator(tokens_exp_new,c,expOpArray,False)
+                elif(tokens_exp_new[c] in "'\""):
+                    expOpArray, c = self.intoQuotationsApostrophesV2(tokens_exp_new,c,expOpArray)
+                else:
+                    l = 0
+                    print('else')
+
+            if(len(except_arr) == 0):
+                self.tokensReadyForPosFix[key] = expOpArray
+            else:
+                self.tokensReadyForPosFix[key] = [expOpArray,except_arr]
+            expOpArray = []
+            except_arr = []
+
+        print('')
+
+        #for key, exp in self.tokensReadyForPosFix.items():
+        #    self.tokensPosFixInFile[key] =  self.objToPostfix.infix_to_postfix(exp)
 
 
-
-
+    def fileContents(self):
+        self.cocorToP1Convention()
+        self.tokensToPostfix()
+        print(self.charactersInFile)
+        print(self.keyWordsInFile)
+        print(self.tokensInFile)
+        print(self.tokensConvertionInFile)
+        print(self.test_patterns)
 
 
 #tests__________
@@ -321,6 +468,7 @@ def main():
     obj = Cocor()
     obj.read_def_cfg()
     obj.read_test_file()
+    obj.cocorToP1Convention()
     obj.fileContents()
 
 
@@ -329,3 +477,11 @@ if __name__ == "__main__":
 
 
 
+'''
+ident=letter{letter|digit} EXCEPT KEYWORDS.
+number=digit{digit}.
+hexnumber="0x"hexdigit{hexdigit}.
+float=digit{digit}'.'{digit}['E'['+'|'-']digit{digit}].
+space = whitespace{whitespace}.
+test = {digit|letter} digit letter letter.
+'''
