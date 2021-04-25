@@ -17,7 +17,7 @@ from thompson.AFNT import AFNT
 from subsets.Subsets import Subsets
 #from direct.DirectAFD_d import DirectAFD
 from direct.DirectAFD import DirectAFD
-from functions import *
+from functions import functions
 import collections
 
 
@@ -63,7 +63,7 @@ def userInteractionDirect():
 # Executions ________________________
 
 welcome()
-
+functions = functions()
 while True:
 
     menu()
@@ -77,8 +77,8 @@ while True:
             print('\n ")" faltante en la expresion regular ingresada. Vuelva a intentar. \n')
         else:
             print(' - postfix     = '+ postfixRegex)
-            tokens = getRegExUniqueTokens(postfixRegex)
-            postfixRegex = stringToArray(postfixRegex)
+            tokens = functions.getRegExUniqueTokens(postfixRegex)
+            postfixRegex = functions.stringToArray(postfixRegex)
 
             print(' - alfabeto (tokens): '+str(tokens))
 
@@ -95,8 +95,8 @@ while True:
             print('\n ")" faltante en la expresion regular ingresada. Vuelva a intentar. \n')
         else:
             print(' - postfix     = '+ postfixRegex)
-            tokens = getRegExUniqueTokens(postfixRegex)
-            postfixRegex = stringToArray(postfixRegex)
+            tokens = functions.getRegExUniqueTokens(postfixRegex)
+            postfixRegex = functions.stringToArray(postfixRegex)
 
             print(' - alfabeto (tokens): '+str(tokens))
 

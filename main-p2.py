@@ -13,9 +13,9 @@ import os
 import sys
 sys.path.append(".")
 from infix_postfix_related.InfixRegexToPostfixWords import InfixRegexToPostfixWords
-#from direct.DirectAFD import DirectAFD
+from direct.DirectAFDWords import DirectAFDWords
 from cocor.Cocor import Cocor
-from functions import *
+from functions import functions
 import collections
 
 
@@ -36,6 +36,7 @@ def menu():
 
 welcome()
 coco_obj = Cocor()
+functions = functions()
 
 while True:
 
@@ -53,27 +54,26 @@ while True:
 
     elif(option == '2'):
         # Pruebas de funcionalidad
-        '''postfixRegex,chain = tokensToPosfix()
-        if(postfixRegex == 'ERROR_POSTFIX_)'):
-            print('\n ")" faltante en la expresion regular ingresada. Vuelva a intentar. \n')
-        else:
-            print(' - postfix     = '+ postfixRegex)
-            tokens = getRegExUniqueTokens(postfixRegex)
-            postfixRegex = stringToArray(postfixRegex)
+        postfixRegex = ['digit', 'letter', '|', '*', 'digit', '~', 'letter', '~', 'letter', '~', 'α', '~']
+        #postfixRegex = ['a', 'b', '|', '*', 'a', '~', 'b', '~', 'b', '~', 'α', '~']
 
+        if(postfixRegex == 'ERROR_POSTFIX_)'):
+            print('\n ")" faltante en la expresion regular ingresdigit. Vuelva a intentar. \n')
+        else:
+            print(' - postfix     = '+ str(postfixRegex))
+            tokens = functions.getRegExUniqueTokensV2(postfixRegex)
             print(' - alfabeto (tokens): '+str(tokens))
 
-            #objdirect = DirectAFD(tokens,chain,postfixRegex)2
-            #AFD = objdirect.generateDirectAFD()
+            #chain = 'digit letter digit letter letter'
 
-            objdirect = DirectAFD(tokens,chain,postfixRegex)
-            AFD = objdirect.generateDirectAFD()'''
-    
+            chain = 'ababb'
+            objdirect = DirectAFDWords(tokens,chain,postfixRegex)
+            AFD = objdirect.generateDirectAFD()
 
     elif(option == '3'):
         print('\nAdios! ')
         break
     else:
-        input('No se ha elejido ninguna opcion en el menu. Intentalo otravez! Presiona Enter!')
+        input('No se ha elejido ninguna opcion en el menu. Intentalo otrdigitz! Presiona Enter!')
 
 

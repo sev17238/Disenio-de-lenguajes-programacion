@@ -12,6 +12,7 @@ sys.path.append(".")
 from os.path import basename
 from functions import functions
 from infix_postfix_related.InfixRegexToPostfixWords import InfixRegexToPostfixWords
+import string
 
 #Clase de implementacion_________________________________________________
 class Cocor:
@@ -19,6 +20,10 @@ class Cocor:
     """
     # Constructor de las variables
     def __init__(self):
+
+        self.asciiTable = set([chr(char) for char in range(0,255)])
+        self.alphabetLower = 'abcdefghijklmnopqrstuvwxyz'
+        self.alphabetUpper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
         self.keywords = {
             # conditionals, iterators
@@ -63,6 +68,8 @@ class Cocor:
         }
 
         self.charactersInFile = {}
+        self.charactersInFileSubs1 = {}
+        self.charactersInFileSubs2 = {}
         self.keyWordsInFile = {}
         self.tokensInFile = {}
         self.tokensConvertionInFile = {}
@@ -78,7 +85,8 @@ class Cocor:
     def getTokens(self):
         return self.tokensConvertionInFile
 
-
+# ZONA PARA LA LECTURA DEL ARCHIVO-----------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------
     def read_def_cfg(self,file='def_file.cfg'):
         """Funcion para leer el archivo con la definicion de tokens
         """
@@ -92,6 +100,7 @@ class Cocor:
             cnt = 1
             while line:
                 line = line.rstrip()
+                line.rstrip()
                 if not(line.startswith('(.')) and len(line) > 0:
                     
                     if(line.startswith('CHARACTERS')):
@@ -104,7 +113,6 @@ class Cocor:
                     #    header = 'PRODUCTIONS'
 
                     if('=' in line):
-                        
                         arr_ = line.split('=')
                         arr_[0] = arr_[0].replace(' ','')
                         arr_[1] = arr_[1][:-1]
@@ -137,6 +145,8 @@ class Cocor:
                 line = fp.readline()
 
 
+# ZONA DE FUNCIONES PARA RECORRER EXPRESIONES REGULARES DE COCO/R -----------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------
     def intoBraces(self,tokens_exp,c,expArray):
         """Recorre los contenidos dentro de { } y retorna el valor de conversion ()*. 
         Puede tener recursion pero se asume que no habran mas {} dentro de la expresion.
@@ -317,7 +327,7 @@ class Cocor:
                 c += 1
         expArray.append(''.join(word_set))
         return expArray, c 
-    
+
     def alphaNumericIterator(self,tokens_exp,c,expArray,considerOr=True):
         """Recorre una cadena de letras tomando en cuenta | y la retorna.
 
@@ -345,7 +355,82 @@ class Cocor:
         expArray.append(''.join(word_set))
         return expArray, c
 
+# ZONA DE TRATAMIENTO DE CARACTERES -----------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------
+    def charactersSubstitution(self):
+        charactersInFileSubs0 = {}
+        charArray = []
+        for key, char_def in self.charactersInFile.items():
+            new_char_def = []
+            for i in char_def.split(' '):
+                if len(i) > 0:
+                    new_char_def.append(i)
+            charactersInFileSubs0[key] = new_char_def
 
+        #print(':\\\\.')
+        #print('"\'"')
+        #print('\'"\'')
+        print('')
+        # sustitucion de las especificaciones de la tabla ascii en el archivo
+        for key,char_def in charactersInFileSubs0.items():
+            i = 0
+            subs_char_def = []
+            if(key not in 'stringletter digit ignore'):
+                while i < len(char_def):
+                    if(char_def[i] == ' '):
+                        i+=1
+                        continue
+                    elif('chr(' in char_def[i].lower()):
+                        if(char_def[i+1] == '..'):
+                            snum = ''
+                            enum = ''
+                            for i in char_def[i]:
+                                if(i.isdigit()):
+                                    snum += i
+                            for i in char_def[i+2]:
+                                if(i.isdigit()):
+                                    enum += i
+                            start = int(snum)
+                            end = int(enum)
+                            subs_char_def.append(set([chr(char) for char in range(start,end)]))
+                            i += 3
+                        else:
+                            snum = ''
+                            for i in char_def[i]:
+                                if(i.isdigit()):
+                                    snum += i
+                            num = int(snum)
+                            subs_char_def.append(chr(num)) 
+                            i+=1
+                    elif('A' in char_def[i].lower()):
+                        if(char_def[i+1] == '..'):
+                            start = ord('A')
+                            end = ord(char_def[i+2])
+                            subs_char_def.append(set([chr(char) for char in range(start,end)]))
+                            i += 3
+                    elif('a' in char_def[i].lower()):
+                        if(char_def[i+1] == '..'):
+                            start = ord('a')
+                            end = ord(char_def[i+2])
+                            subs_char_def.append(set([chr(char) for char in range(start,end)]))
+                            i += 3
+                    else:
+                        subs_char_def.append(char_def[i])
+                        i += 1
+
+            self.charactersInFileSubs1[key] = subs_char_def
+
+        print('')
+        dd = self.charactersInFileSubs1
+        for key,char_def in self.charactersInFileSubs1.items():
+            substitution = functions.get_value_from_dict(key,dd)
+            if(substitution !=None):
+                self.charactersInFileSubs2[key] = substitution
+
+
+
+# ZONA DE TRATAMIENTO DE TOKENS -----------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------
     def cocorToP1Convention(self):
         """funcion para acoplar las expresiones regulares al proyecto 1 haciendo conversiones como: 
 
@@ -410,7 +495,6 @@ class Cocor:
                 self.tokensConvertionInFile[key] = '~'.join(expArray)
             expArray = []
 
-
     def tokensToPostfix(self):
         expOpArray = []
         except_arr = []
@@ -453,6 +537,10 @@ class Cocor:
         #    self.tokensPosFixInFile[key] =  self.objToPostfix.infix_to_postfix(exp)
 
 
+    def tokensSubstitution(self):
+
+        return 0
+
     def fileContents(self):
         self.cocorToP1Convention()
         self.tokensToPostfix()
@@ -465,11 +553,16 @@ class Cocor:
 
 #tests__________
 def main():
-    obj = Cocor()
+    '''obj = Cocor()
     obj.read_def_cfg()
     obj.read_test_file()
+    obj.charactersSubstitution()
     obj.cocorToP1Convention()
-    obj.fileContents()
+    obj.tokensToPostfix()
+    obj.fileContents()'''
+
+
+
 
 
 if __name__ == "__main__":
