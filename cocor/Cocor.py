@@ -68,7 +68,6 @@ class Cocor:
         }
 
         self.charactersInFile = {}
-        self.charactersInFileSubs1 = {}
         self.charactersInFileSubs2 = {}
         self.keyWordsInFile = {}
         self.tokensInFile = {}
@@ -357,77 +356,231 @@ class Cocor:
 
 # ZONA DE TRATAMIENTO DE CARACTERES -----------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
+
+    def setOperations(self,i,char_def,set1):
+        chr_result_operations = [set1]
+        while i < len(char_def):
+            if(char_def[i] == '+'):
+                set2 = char_def[i+1]
+                set1_ = chr_result_operations.pop()
+                snum = ''
+                if('chr(' in set2.lower()):
+                    for e in set2:
+                        if(e.isdigit()):
+                            snum += e
+                    num = int(snum)
+                    set2 = set(chr(num))
+                    chr_result_operations.append(set1_.union(set2))
+                else:
+                    ssss = type(set1_)
+                    if(isinstance(set1_, str)):
+                        set1_ = set(set1_)
+                    if(isinstance(set2, str)):
+                        set2 = set(set2)
+                    chr_result_operations.append(set1_.union(set2))
+                i += 2
+            elif(char_def[i] == '-'):
+                set2 = char_def[i+1]
+                set1_ = chr_result_operations.pop()
+                snum = ''
+                if('chr(' in set2.lower()):
+                    for e in set2:
+                        if(e.isdigit()):
+                            snum += e
+                    num = int(snum)
+                    set2 = set(chr(num))
+                    chr_result_operations.append(set1_.difference(set2))
+                else:
+                    chr_result_operations.append(set1_.difference(set2))
+                i += 2
+            else:
+                print('no operations else!!!!!!!!!!! :O')
+                i += 1
+        return i, chr_result_operations
+
+    def whenChrFound(self,char_def,i,subs_char_def):
+        if('..' in char_def):
+            snum = ''
+            enum = ''
+            for e in char_def[i]:
+                if(e.isdigit()):
+                    snum += e
+            for e in char_def[i+2]:
+                if(e.isdigit()):
+                    enum += e
+            start = int(snum)
+            end = int(enum)
+            i += 3
+            chr_range = set([chr(char) for char in range(start,end)])
+            if(i < len(char_def)):
+                i,chr_result_operations = self.setOperations(i,char_def,chr_range)
+                subs_char_def.append(chr_result_operations)
+            else:
+                subs_char_def.append(chr_range)
+
+            return i, subs_char_def
+        else:
+            snum = ''
+            for e in char_def[i]:
+                if(e.isdigit()):
+                    snum += e
+            num = int(snum)
+            i += 1
+            first_char_in_expresion = chr(num)
+            if(i < len(char_def)):
+                i,chr_result_operations = self.setOperations(i,char_def,first_char_in_expresion)
+                subs_char_def.append(chr_result_operations) 
+            else:
+                subs_char_def.append(first_char_in_expresion)
+
+            return i, subs_char_def
+
+    def whenAoraFound(self,char_def,i,subs_char_def):
+        if('..' in char_def):
+            start = ord(char_def[i])
+            end = ord(char_def[i+2])
+            letter_range = set([chr(char) for char in range(start,end)])
+            i += 3
+            if(i < len(char_def)):
+                i,chr_result_operations = self.setOperations(i,char_def,letter_range)
+                subs_char_def.append(chr_result_operations)
+            else:
+                subs_char_def.append(letter_range)
+        else:
+            any_word = char_def[i]
+            i += 1
+            if(i < len(char_def)):
+                i,chr_result_operations = self.setOperations(i,char_def,any_word)
+                subs_char_def.append(chr_result_operations)
+            else:
+                subs_char_def.append(any_word)
+
+        return i, subs_char_def
+
+    def whenANYFound(self,char_def,i,subs_char_def):
+        anyy = set([chr(char) for char in range(0,255)])
+        i += 1
+        if(i < len(char_def)):
+            i,chr_result_operations = self.setOperations(i,char_def,anyy)
+            subs_char_def.append(chr_result_operations) 
+        else:
+            subs_char_def.append(anyy)
+
+        return i, subs_char_def
+
+    def dictSubstitionItself(self,dict1):
+        dict_result = {}
+        for key,char_def in dict1.items():
+            i = 0
+            new_exp = []
+            while i < len(char_def):
+                value_key = char_def[i]
+                substitution = self.functions.get_value_from_dict(value_key,dict1)
+                if(substitution != None):
+                    new_exp.append(substitution[0])
+                else:
+                    new_exp.append(char_def[i])
+                i += 1
+
+            dict_result[key] = new_exp
+        return dict_result
+
+    def dictSubstitionOther(self,dict1,dict2):
+        dict_result = {}
+        for key,char_def in dict1.items():
+            i = 0
+            new_exp = []
+            while i < len(char_def):
+                value_key = char_def[i]
+                substitution = self.functions.get_value_from_dict(value_key,dict2)
+                if(substitution != None):
+                    new_exp.append(substitution[0])
+                else:
+                    new_exp.append(char_def[i])
+                i += 1
+
+            dict_result[key] = new_exp
+        return  dict_result
+
     def charactersSubstitution(self):
         charactersInFileSubs0 = {}
         charArray = []
+        # ciclo para convertir los strings en arrays que encapsulen cada operando (item) de la expresion del caracter
         for key, char_def in self.charactersInFile.items():
             new_char_def = []
             for i in char_def.split(' '):
-                if len(i) > 0:
-                    new_char_def.append(i)
+                if (len(i) > 0):
+                    e = ''
+                    if(i.count('"') == 2):
+                        e = i.replace('"','')
+                        new_char_def.append(e)
+                    elif(i.count("'") == 2):
+                        e = i.replace("'",'')
+                        new_char_def.append(e)
+                    else:
+                        new_char_def.append(i)
             charactersInFileSubs0[key] = new_char_def
 
         #print(':\\\\.')
         #print('"\'"')
         #print('\'"\'')
+
         print('')
+
+        charactersInFileSubs1 = self.dictSubstitionItself(charactersInFileSubs0)
+
+        print('')
+
+        #self.charactersInFileSubs2 = charactersInFileSubs1
+
         # sustitucion de las especificaciones de la tabla ascii en el archivo
-        for key,char_def in charactersInFileSubs0.items():
-            i = 0
-            subs_char_def = []
-            if(key not in 'stringletter digit ignore'):
+
+        #! CHECAR LUEGO DE HEXDIGIT!!!!
+        for key,char_def in charactersInFileSubs1.items():
+            if(key not in 'letter digit'):
+                subs_char_def = []
+                subs_char_def2 = []
+
+                i = 0
                 while i < len(char_def):
+                    curr = char_def[i]
                     if(char_def[i] == ' '):
-                        i+=1
+                        i +=1
                         continue
                     elif('chr(' in char_def[i].lower()):
-                        if(char_def[i+1] == '..'):
-                            snum = ''
-                            enum = ''
-                            for i in char_def[i]:
-                                if(i.isdigit()):
-                                    snum += i
-                            for i in char_def[i+2]:
-                                if(i.isdigit()):
-                                    enum += i
-                            start = int(snum)
-                            end = int(enum)
-                            subs_char_def.append(set([chr(char) for char in range(start,end)]))
-                            i += 3
-                        else:
-                            snum = ''
-                            for i in char_def[i]:
-                                if(i.isdigit()):
-                                    snum += i
-                            num = int(snum)
-                            subs_char_def.append(chr(num)) 
-                            i+=1
-                    elif('A' in char_def[i].lower()):
-                        if(char_def[i+1] == '..'):
-                            start = ord('A')
-                            end = ord(char_def[i+2])
-                            subs_char_def.append(set([chr(char) for char in range(start,end)]))
-                            i += 3
-                    elif('a' in char_def[i].lower()):
-                        if(char_def[i+1] == '..'):
-                            start = ord('a')
-                            end = ord(char_def[i+2])
-                            subs_char_def.append(set([chr(char) for char in range(start,end)]))
-                            i += 3
+                        i, subs_char_def = self.whenChrFound(char_def,i,subs_char_def)
+                    elif('ANY' in char_def[i]):
+                        i,subs_char_def = self.whenANYFound(char_def,i,subs_char_def)
+                    elif('A' in char_def[i] or 'a' in char_def[i]):
+                        i,subs_char_def = self.whenAoraFound(char_def,i,subs_char_def)
                     else:
-                        subs_char_def.append(char_def[i])
+                        any_word = set(char_def[i])
                         i += 1
+                        if(i < len(char_def)):
+                            i,chr_result_operations = self.setOperations(i,char_def,any_word)
+                            subs_char_def.append(chr_result_operations) 
+                        else:
+                            subs_char_def.append(any_word)
 
-            self.charactersInFileSubs1[key] = subs_char_def
+                self.charactersInFileSubs2[key] = subs_char_def[0]
+                '''if('+' in char_def or '-' in char_def):
+                    i = 0
+                    while i < len(char_def):
+                        if type(char_def[i]) != 'set':
+                            chr_capsule = set(char_def[i])
+                        i,chr_result_operations = self.setOperations(i,char_def,chr_capsule)
+                        subs_char_def2.append(chr_result_operations)
 
+                    self.charactersInFileSubs2[key] = subs_char_def2
+                else:
+                    self.charactersInFileSubs2[key] = subs_char_def'''
+
+
+
+        print(self.charactersInFileSubs2['files'][0])
         print('')
-        dd = self.charactersInFileSubs1
-        for key,char_def in self.charactersInFileSubs1.items():
-            substitution = functions.get_value_from_dict(key,dd)
-            if(substitution !=None):
-                self.charactersInFileSubs2[key] = substitution
 
-
+        
 
 # ZONA DE TRATAMIENTO DE TOKENS -----------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
@@ -538,8 +691,12 @@ class Cocor:
 
 
     def tokensSubstitution(self):
+        dict1 = self.tokensReadyForPosFix
+        dict2 = self.charactersInFileSubs2
+        self.tokensSubstitution = self.dictSubstitionOther(dict1,dict2)
 
         return 0
+
 
     def fileContents(self):
         self.cocorToP1Convention()
@@ -551,18 +708,61 @@ class Cocor:
         print(self.test_patterns)
 
 
+
 #tests__________
 def main():
-    '''obj = Cocor()
+    obj = Cocor()
     obj.read_def_cfg()
     obj.read_test_file()
     obj.charactersSubstitution()
     obj.cocorToP1Convention()
     obj.tokensToPostfix()
-    obj.fileContents()'''
+
+    '''s = set([chr(char) for char in range(0,255)])
+    z = ''.join(s)
+
+    print(s)
+    print('')
+    print(z)'''
+
+    
+    
+    '''d = {
+        'letter': ['abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'],
+        'digit': ['0123456789'],
+        'hexdigit': ['digit', '+', 'BCDEF'],
+        'tab': ['CHR(9)'],
+        'eol': ['CHR(10)'],
+        'files': ['letter', '+', 'digit', '+', ':\\\\.'],
+        'chars': ['CHR(32)', '..', 'CHR(255)', '-', "'"],
+        'string': ['CHR(32)', '..', 'CHR(255)', '-', '"'],
+        'macros': ['ANY', '-', 'eol']
+    }
+
+    f = d
+    z = {}
+    for key,value in d.items():
+        i = 0
+        new_arr = []
+        while i < len(value):
+            val = value[i]
+            substitution = obj.functions.get_value_from_dict(value[i],f)
+            if(substitution !=None):
+                new_arr.append(substitution)
+            else:
+                new_arr.append(value[i])
+            i += 1
+        z[key] = new_arr
+
+    print('')'''
 
 
 
+    #obj.fileContents()
+
+    #i = ['a','s','..']
+    #e = '..'
+    #if(e in i): print(True)
 
 
 if __name__ == "__main__":
