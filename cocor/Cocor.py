@@ -178,12 +178,10 @@ class Cocor:
     def intoBrackets(self,tokens_exp,c,expArray):
         """Recorre los contenidos dentro de [ ] y retorna el valor. 
         Hay recursion ya que pueden haber mas [ ] dentro.
-
         Args:
             tokens_exp (str): cadena con tokens
             c (int): contador externo
             expArray (list): lista con todos los tokens encontrados en tokens_exp
-
         Returns:
             list: expArray actualizado
             int: el contador actualizado
@@ -277,7 +275,11 @@ class Cocor:
         c += 1
         word_set.append(q)
         while c < len(tokens_exp):
-            if tokens_exp[c+1] == "|":
+            forwardOr = False
+            if c+1 < (len(tokens_exp)):
+                if tokens_exp[c+1] == "|":
+                    forwardOr = True
+            if forwardOr:
                 if tokens_exp[c+2] in "'\"":
                     word_set.append(tokens_exp[c]) #se inserta el '
                     word_set.append(tokens_exp[c+1]) #se inserta el |
@@ -294,8 +296,20 @@ class Cocor:
             else:
                 word_set.append(tokens_exp[c])
                 c += 1
+
         expArray.append(''.join(word_set))
         return expArray, c 
+
+        ''' #no use at the end
+        result_word = ''.join(word_set)
+        result_word2 = ''
+        if result_word == '\'"\'': result_word2 = result_word.replace("'",'')
+        elif result_word == "\"'\"": result_word2 = result_word.replace('"','')
+        else: 
+            s = result_word.replace("'",'') 
+            result_word2 = s.replace('"','')
+        expArray.append(result_word2)
+        return expArray, c '''
 
     def intoQuotationsApostrophesV2(self,tokens_exp,c,expArray):
         """Recorre los contenidos dentro de ' ' o " " sin cosidrerar | y retorna el valor.
@@ -370,13 +384,24 @@ class Cocor:
                             snum += e
                     num = int(snum)
                     set2 = set(chr(num))
-                    chr_result_operations.append(set1_.union(set2))
-                else:
-                    ssss = type(set1_)
                     if(isinstance(set1_, str)):
                         set1_ = set(set1_)
                     if(isinstance(set2, str)):
                         set2 = set(set2)
+                    if(isinstance(set1_, list)):
+                        set1_ = set1_[0]
+                    if(isinstance(set2, list)):
+                        set2 = set2[0]
+                    chr_result_operations.append(set1_.union(set2))
+                else:
+                    if(isinstance(set1_, str)):
+                        set1_ = set(set1_)
+                    if(isinstance(set2, str)):
+                        set2 = set(set2)
+                    if(isinstance(set1_, list)):
+                        set1_ = set1_[0]
+                    if(isinstance(set2, list)):
+                        set2 = set2[0]
                     chr_result_operations.append(set1_.union(set2))
                 i += 2
             elif(char_def[i] == '-'):
@@ -426,7 +451,7 @@ class Cocor:
                     snum += e
             num = int(snum)
             i += 1
-            first_char_in_expresion = chr(num)
+            first_char_in_expresion = [set([chr(num)])]
             if(i < len(char_def)):
                 i,chr_result_operations = self.setOperations(i,char_def,first_char_in_expresion)
                 subs_char_def.append(chr_result_operations) 
@@ -439,7 +464,7 @@ class Cocor:
         if('..' in char_def):
             start = ord(char_def[i])
             end = ord(char_def[i+2])
-            letter_range = set([chr(char) for char in range(start,end)])
+            letter_range = [set([chr(char) for char in range(start,end)])]
             i += 3
             if(i < len(char_def)):
                 i,chr_result_operations = self.setOperations(i,char_def,letter_range)
@@ -494,7 +519,7 @@ class Cocor:
                 value_key = char_def[i]
                 substitution = self.functions.get_value_from_dict(value_key,dict2)
                 if(substitution != None):
-                    new_exp.append(substitution[0])
+                    new_exp.append(substitution)
                 else:
                     new_exp.append(char_def[i])
                 i += 1
@@ -508,7 +533,8 @@ class Cocor:
         # ciclo para convertir los strings en arrays que encapsulen cada operando (item) de la expresion del caracter
         for key, char_def in self.charactersInFile.items():
             new_char_def = []
-            for i in char_def.split(' '):
+            ss = char_def.split(' ')
+            for i in ss:
                 if (len(i) > 0):
                     e = ''
                     if(i.count('"') == 2):
@@ -519,6 +545,31 @@ class Cocor:
                         new_char_def.append(e)
                     else:
                         new_char_def.append(i)
+                    '''elif('+' in i ):
+                        opers = i.split('+')
+                        numPluses = len(opers)-1
+                        c = 0
+                        for c in range(len(opers)):
+                            definition = opers[c]
+                            if(c > 0):
+                                plus = '+'
+                                new_char_def.append(plus)
+                                new_char_def.append(definition)
+                            elif(c == 0):
+                                new_char_def.append(definition)
+                    elif('-' in i ):
+                        opers = i.split('-')
+                        numPluses = len(opers)-1
+                        c = 0
+                        for c in range(len(opers)):
+                            definition = opers[c]
+                            if(c > 0):
+                                plus = '-'
+                                new_char_def.append(plus)
+                                new_char_def.append(definition)
+                            elif(c == 0):
+                                new_char_def.append(definition)'''
+                    
             charactersInFileSubs0[key] = new_char_def
 
         #print(':\\\\.')
@@ -537,64 +588,60 @@ class Cocor:
 
         #! CHECAR LUEGO DE HEXDIGIT!!!!
         for key,char_def in charactersInFileSubs1.items():
-            if(key not in 'letter digit'):
-                subs_char_def = []
-                subs_char_def2 = []
+            #if(key not in 'letter digit'):
+            subs_char_def = []
+            subs_char_def2 = []
 
+            i = 0
+            while i < len(char_def):
+                curr = char_def[i]
+                if(char_def[i] == ' '):
+                    i +=1
+                    continue
+                elif('chr(' in char_def[i].lower()):
+                    i, subs_char_def = self.whenChrFound(char_def,i,subs_char_def)
+                elif('ANY' in char_def[i]):
+                    i,subs_char_def = self.whenANYFound(char_def,i,subs_char_def)
+                elif('A' in char_def[i] or 'a' in char_def[i]):
+                    i,subs_char_def = self.whenAoraFound(char_def,i,subs_char_def)
+                else:
+                    any_word = set(char_def[i])
+                    i += 1
+                    if(i < len(char_def)):
+                        i,chr_result_operations = self.setOperations(i,char_def,any_word)
+                        subs_char_def.append(chr_result_operations) 
+                    else:
+                        subs_char_def.append([any_word])
+
+            self.charactersInFileSubs2[key] = subs_char_def[0][0]
+            '''if('+' in char_def or '-' in char_def):
                 i = 0
                 while i < len(char_def):
-                    curr = char_def[i]
-                    if(char_def[i] == ' '):
-                        i +=1
-                        continue
-                    elif('chr(' in char_def[i].lower()):
-                        i, subs_char_def = self.whenChrFound(char_def,i,subs_char_def)
-                    elif('ANY' in char_def[i]):
-                        i,subs_char_def = self.whenANYFound(char_def,i,subs_char_def)
-                    elif('A' in char_def[i] or 'a' in char_def[i]):
-                        i,subs_char_def = self.whenAoraFound(char_def,i,subs_char_def)
-                    else:
-                        any_word = set(char_def[i])
-                        i += 1
-                        if(i < len(char_def)):
-                            i,chr_result_operations = self.setOperations(i,char_def,any_word)
-                            subs_char_def.append(chr_result_operations) 
-                        else:
-                            subs_char_def.append(any_word)
+                    if type(char_def[i]) != 'set':
+                        chr_capsule = set(char_def[i])
+                    i,chr_result_operations = self.setOperations(i,char_def,chr_capsule)
+                    subs_char_def2.append(chr_result_operations)
 
-                self.charactersInFileSubs2[key] = subs_char_def[0]
-                '''if('+' in char_def or '-' in char_def):
-                    i = 0
-                    while i < len(char_def):
-                        if type(char_def[i]) != 'set':
-                            chr_capsule = set(char_def[i])
-                        i,chr_result_operations = self.setOperations(i,char_def,chr_capsule)
-                        subs_char_def2.append(chr_result_operations)
-
-                    self.charactersInFileSubs2[key] = subs_char_def2
-                else:
-                    self.charactersInFileSubs2[key] = subs_char_def'''
+                self.charactersInFileSubs2[key] = subs_char_def2
+            else:
+                self.charactersInFileSubs2[key] = subs_char_def'''
 
 
 
-        print(self.charactersInFileSubs2['files'][0])
+        #print(self.charactersInFileSubs2['files'][0])
         print('')
 
-        
 
 # ZONA DE TRATAMIENTO DE TOKENS -----------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------
     def cocorToP1Convention(self):
         """funcion para acoplar las expresiones regulares al proyecto 1 haciendo conversiones como: 
-
         - kleene closure
             - digit{digit} = digit digit *
             - {} = * (0 o mas)  -->  r*
-
         - positive closure
             - [digit] = digit? = digit|ε
             - [] = ? (cero o una instancia)  -->  r? = r|ε
-
         - concatenacion
             - '~' = operador explicito para concatenacion
         """
@@ -642,11 +689,16 @@ class Cocor:
                 #    joining = token_before+closure+')'
                 #    finalExpArray.append(joining)
                 #    finalExpArray.append('#')
-
-                self.tokensConvertionInFile[key] = '~'.join(finalExpArray)
+                finalExpString = '~'.join(finalExpArray)
+                finalExpString = finalExpString.replace('~)',')')
+                self.tokensConvertionInFile[key] = finalExpString
             else:
-                self.tokensConvertionInFile[key] = '~'.join(expArray)
+                expString = '~'.join(expArray)
+                expString = expString.replace('~)',')')
+                self.tokensConvertionInFile[key] = expString
             expArray = []
+
+        print('')
 
     def tokensToPostfix(self):
         expOpArray = []
@@ -680,7 +732,8 @@ class Cocor:
             if(len(except_arr) == 0):
                 self.tokensReadyForPosFix[key] = expOpArray
             else:
-                self.tokensReadyForPosFix[key] = [expOpArray,except_arr]
+                #self.tokensReadyForPosFix[key] = [expOpArray,except_arr]
+                self.tokensReadyForPosFix[key] = expOpArray
             expOpArray = []
             except_arr = []
 
@@ -694,6 +747,7 @@ class Cocor:
         dict1 = self.tokensReadyForPosFix
         dict2 = self.charactersInFileSubs2
         self.tokensSubstitution = self.dictSubstitionOther(dict1,dict2)
+        print('')
 
         return 0
 
@@ -712,11 +766,12 @@ class Cocor:
 #tests__________
 def main():
     obj = Cocor()
-    obj.read_def_cfg()
+    obj.read_def_cfg('HexNumber.cfg')
     obj.read_test_file()
     obj.charactersSubstitution()
     obj.cocorToP1Convention()
     obj.tokensToPostfix()
+    obj.tokensSubstitution()
 
     '''s = set([chr(char) for char in range(0,255)])
     z = ''.join(s)
@@ -778,3 +833,5 @@ float=digit{digit}'.'{digit}['E'['+'|'-']digit{digit}].
 space = whitespace{whitespace}.
 test = {digit|letter} digit letter letter.
 '''
+
+
