@@ -749,6 +749,11 @@ class Cocor:
                     l = 0
                     print('else')
 
+            expOpArray.insert(0,'(')
+            expOpArray.append(')')
+            expOpArray.append('~')
+            expOpArray.append('$')
+
             if(len(except_arr) == 0):
                 self.tokensReadyForPosFix[key] = expOpArray
             else:
@@ -763,6 +768,7 @@ class Cocor:
         #for key, exp in self.tokensReadyForPosFix.items():
         #    self.tokensPosFixInFile[key] =  self.objToPostfix.infix_to_postfix(exp)
 
+        #print('')
 
     def orBetweenExpresions(self):
         exp_final = []
