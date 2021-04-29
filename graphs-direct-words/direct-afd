@@ -1,0 +1,15 @@
+// direct-afd
+digraph finite_state_machine {
+	rankdir=LR size="8,8"
+	node [color=plum2 style=filled]
+	node [shape=doublecircle]
+	3
+	3
+	node [shape=circle]
+	0 -> 3 [label="{'W', 'P', 'F', 'G', 'i', 'K', 'n', 'v', 'p', 'J', 'V', 'h', 'q', 's', 'S', 'u', 'f', 'k', 'T', 'r', 'd', 'c', 'M', 'O', 'D', 'a', 'C', 'y', 'e', 'x', 'Z', 'Q', 'z', 'w', 'g', 'R', 'b', 'E', 'm', 'L', 'I', 'N', 'j', 'A', 'H', 'U', 'Y', 'o', 'B', 't', 'l', 'X'}"]
+	0 -> 1 [label="{'7', '3', '6', '4', '9', '2', '8', '0', '1', '5'}"]
+	1 -> 1 [label="{'7', '3', '6', '4', '9', '2', '8', '0', '1', '5'}"]
+	3 -> 3 [label="{'W', 'P', 'F', 'G', 'i', 'K', 'n', 'v', 'p', 'J', 'V', 'h', 'q', 's', 'S', 'u', 'f', 'k', 'T', 'r', 'd', 'c', 'M', 'O', 'D', 'a', 'C', 'y', 'e', 'x', 'Z', 'Q', 'z', 'w', 'g', 'R', 'b', 'E', 'm', 'L', 'I', 'N', 'j', 'A', 'H', 'U', 'Y', 'o', 'B', 't', 'l', 'X'}"]
+	3 -> 3 [label="{'7', '3', '6', '4', '9', '2', '8', '0', '1', '5'}"]
+	fontsize=20 label="\ndirect-afd"
+}

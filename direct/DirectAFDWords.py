@@ -15,7 +15,7 @@ from functions import *
 from graphs.NodeD import *
 from graphviz import Digraph
 
-class DirectAFD:
+class DirectAFDWords:
     """Clase que comvierte una expresion regular en formato postfix a un automara finito determinista AFD.
     """
 
@@ -90,7 +90,7 @@ class DirectAFD:
         if(character == "ε"):
             return True
         else:
-            if(self.functions.isOperand(character)):
+            if(self.functions.isOperandV2(character)):
                 return False
             elif (character == "|"):
                 nodeC1 = Nodes.pop()
@@ -99,7 +99,7 @@ class DirectAFD:
                 annullableC2 = nodeC2.getAnnullable()
 
                 return (annullableC1 or annullableC2)
-            elif(character == "."):
+            elif(character == '~'):
                 nodeC1 = Nodes.pop()
                 nodeC2 = Nodes.pop()
                 annullableC1 = nodeC1.getAnnullable()
@@ -127,7 +127,7 @@ class DirectAFD:
         if(character == "ε"):
             return ""
         else:
-            if(self.functions.isOperand(character)):
+            if(self.functions.isOperandV2(character)):
                 nodeC1 = Nodes.pop()
                 nodeC1Id = nodeC1.getNodeId()
                 return [nodeC1Id]
@@ -136,16 +136,15 @@ class DirectAFD:
                 nodeC2 = Nodes.pop()
                 firstPosC1 = nodeC1.getFirstPos()
                 firstPosC2 = nodeC2.getFirstPos()
-                if(firstPosC1 == ""):
-                    firstPosC1 = []
-                if(firstPosC2 == ""):
-                    firstPosC2 = []
+                if(firstPosC1 == ""): firstPosC1 = []
+                if(firstPosC2 == ""): firstPosC2 = []
                 arrayFinalOr = firstPosC1+firstPosC2
+                #ordenamiento
                 arrayFinalOr = list(dict.fromkeys(arrayFinalOr))
                 arrayFinalOr.sort()
 
                 return arrayFinalOr
-            elif(character == "."):
+            elif(character == '~'):
                 nodeC1 = Nodes.pop()
                 nodeC2 = Nodes.pop()
                 annullableC1 = nodeC1.getAnnullable()
@@ -160,6 +159,7 @@ class DirectAFD:
                 else:
                     arrayFinalAND = firstPosC1
 
+                #ordenamiento
                 arrayFinalAND = list(dict.fromkeys(arrayFinalAND))
                 arrayFinalAND.sort()
 
@@ -170,6 +170,7 @@ class DirectAFD:
                 if(firstPosC1 == ""):
                     firstPosC1 = []
                 arrayFinalKleene = firstPosC1
+                #ordenamiento
                 arrayFinalKleene = list(dict.fromkeys(arrayFinalKleene))
                 arrayFinalKleene.sort()
 
@@ -190,7 +191,7 @@ class DirectAFD:
             return ""
         else:
             # si es un character, retornamos el mismo id, esa es su primera pos
-            if(self.functions.isOperand(character)):
+            if(self.functions.isOperandV2(character)):
                 nodeC1 = Nodes.pop()
                 nodeC1Id = nodeC1.getNodeId()
                 return [nodeC1Id]
@@ -204,11 +205,12 @@ class DirectAFD:
                 if(lastPosC2 == ""):
                     lastPosC2 = []
                 arrayFinalOr = lastPosC1+lastPosC2
+                #ordenamiento
                 arrayFinalOr = list(dict.fromkeys(arrayFinalOr))
                 arrayFinalOr.sort()
 
                 return arrayFinalOr
-            elif(character == "."):
+            elif(character == '~'):
                 nodeC1 = Nodes.pop()
                 nodeC2 = Nodes.pop()
                 annullableC2 = nodeC2.getAnnullable()
@@ -222,7 +224,7 @@ class DirectAFD:
                     arrayFinalAND = lastPosC1+lastPosC2
                 else:
                     arrayFinalAND = lastPosC2
-
+                #ordenamiento
                 arrayFinalAND = list(dict.fromkeys(arrayFinalAND))
                 arrayFinalAND.sort()
 
@@ -233,6 +235,7 @@ class DirectAFD:
                 if(lastPosC1 == ""):
                     lastPosC1 = []
                 arrayFinalKleene = lastPosC1
+                #ordenamiento
                 arrayFinalKleene = list(dict.fromkeys(arrayFinalKleene))
                 arrayFinalKleene.sort()
 
@@ -250,7 +253,7 @@ class DirectAFD:
             list: los estados pertenecientes a nextPos del nodo en cuestion
         """
         # si es character, retorna el mismo id, esa es su primera pos
-        if(character == "."):
+        if(character == '~'):
             nodeC1 = Nodes.pop()
             nodeC2 = Nodes.pop()
 
@@ -265,6 +268,7 @@ class DirectAFD:
             for x in lastPosC1:
                 arrayTemporal = self.nextPosDict[int(x)]
                 arrayTemporal = arrayTemporal+firstPosC2
+                #ordenamiento
                 arrayTemporal = list(dict.fromkeys(arrayTemporal))
                 arrayTemporal.sort()
                 self.nextPosDict[int(x)] = arrayTemporal
@@ -279,6 +283,7 @@ class DirectAFD:
             for x in lastPosC1:
                 arrayTemporal = self.nextPosDict[int(x)]
                 arrayTemporal = arrayTemporal+firstPosC1
+                #ordenamiento
                 arrayTemporal = list(dict.fromkeys(arrayTemporal))
                 arrayTemporal.sort()
                 self.nextPosDict[int(x)] = arrayTemporal
@@ -337,7 +342,7 @@ class DirectAFD:
         lastId = self.getAcceptingStatesAFD()
 
         filename='direct-afd'
-        file_name = 'graphs-direct/'+filename
+        file_name = 'graphs-direct-words/'+filename
         dot = Digraph('finite_state_machine',comment=filename, format="png")
         dot.attr(rankdir='LR', size='8,8')
         dot.attr('node', style='filled',color='plum2') #,color='lightgrey'
@@ -351,7 +356,7 @@ class DirectAFD:
             if(len(x[1]) > 0 and len(x[3]) > 0):
                 estado1 = self.getStateNumberFromArray(x[1])
                 esatdo2 = self.getStateNumberFromArray(x[3])
-                dot.edge(str(estado1), str(esatdo2), x[2])
+                dot.edge(str(estado1), str(esatdo2), str(x[2]))
         dot.attr(label=r'\n'+filename, fontsize='20')
         dot.render(filename=file_name, view=True)
 
@@ -361,7 +366,7 @@ class DirectAFD:
         """
         # acá se construye el arbol
         for postfixValue in self.expresionPostfix:
-            if(self.functions.isOperand(postfixValue)):  # * si es una letra
+            if(self.functions.isOperandV2(postfixValue)):  # * si es una letra
                 if(postfixValue == "ε"):  # si es un 'ε' entonces no se le agrega numeración
                     nodeFirstPos = ""
                     nodeLastPos = ""
@@ -416,7 +421,7 @@ class DirectAFD:
                 self.nodesArray.append(nodeOr)  # se agrega el nodo en cuestion
 
             # el AND NO tiene numero
-            elif(postfixValue == "."):  
+            elif(postfixValue == '~'):  
                 nodeAndAnulable = ""
                 nodeAndfirstPos = ""
                 nodeAndlastPos = ""
