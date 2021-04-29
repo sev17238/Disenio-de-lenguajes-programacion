@@ -96,8 +96,6 @@ class functions:
         Funcion que obtiene los tokens unicos o el lenguaje de una expresion regular en formato postfix.
         '''
         ops = '*|.#'
-        if(words):
-            ops = '*|~α'
         tokens = []
         for i in range(len(postfix_regex)):
             token = postfix_regex[i]
@@ -112,15 +110,19 @@ class functions:
         '''
         Funcion que obtiene los tokens unicos o el lenguaje de una expresion regular en formato postfix.
         '''
-        ops = '*|~α'
+        ops = '*|~#'
         tokens = []
         for i in range(len(postfix_regex)):
             token = postfix_regex[i]
-            op_exist = token in ops
-            if(op_exist == False):
+            #op_exist = token in ops
+            #if(op_exist == False):
+            if(token != '*' and token != '|' and token != '~' and token != '#'):
                 tokens.append(token)
 
-        return list(dict.fromkeys(tokens))
+        res = []
+        [res.append(x) for x in tokens if x not in res]
+
+        return res
         #print(getRegExUniqueTokens('10|10|*.0.0.1.'))
 
     def stringToArray(self,string):
@@ -136,6 +138,17 @@ class functions:
         *@param ch: el caracter a ser probado
         """
         if character.isalnum() or character == "ε" or character == "#":
+            return True
+        return False
+
+    def isOperandV2(self,character):
+        """
+        REtorna TRUE si el caracter ingresado es un alfanumerico, FALSE de lo contrario
+        *@param ch: el caracter a ser probado
+        """
+        sett = False
+        if (isinstance(character,set)): sett = True
+        if sett or character == "ε" or character == "#":
             return True
         return False
 

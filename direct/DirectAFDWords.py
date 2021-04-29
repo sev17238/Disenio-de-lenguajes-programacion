@@ -90,7 +90,7 @@ class DirectAFDWords:
         if(character == "ε"):
             return True
         else:
-            if(self.functions.isOperand(character)):
+            if(self.functions.isOperandV2(character)):
                 return False
             elif (character == "|"):
                 nodeC1 = Nodes.pop()
@@ -99,7 +99,7 @@ class DirectAFDWords:
                 annullableC2 = nodeC2.getAnnullable()
 
                 return (annullableC1 or annullableC2)
-            elif(character == "~"):
+            elif(character == '~'):
                 nodeC1 = Nodes.pop()
                 nodeC2 = Nodes.pop()
                 annullableC1 = nodeC1.getAnnullable()
@@ -127,7 +127,7 @@ class DirectAFDWords:
         if(character == "ε"):
             return ""
         else:
-            if(self.functions.isOperand(character)):
+            if(self.functions.isOperandV2(character)):
                 nodeC1 = Nodes.pop()
                 nodeC1Id = nodeC1.getNodeId()
                 return [nodeC1Id]
@@ -144,7 +144,7 @@ class DirectAFDWords:
                 arrayFinalOr.sort()
 
                 return arrayFinalOr
-            elif(character == "~"):
+            elif(character == '~'):
                 nodeC1 = Nodes.pop()
                 nodeC2 = Nodes.pop()
                 annullableC1 = nodeC1.getAnnullable()
@@ -191,7 +191,7 @@ class DirectAFDWords:
             return ""
         else:
             # si es un character, retornamos el mismo id, esa es su primera pos
-            if(self.functions.isOperand(character)):
+            if(self.functions.isOperandV2(character)):
                 nodeC1 = Nodes.pop()
                 nodeC1Id = nodeC1.getNodeId()
                 return [nodeC1Id]
@@ -210,7 +210,7 @@ class DirectAFDWords:
                 arrayFinalOr.sort()
 
                 return arrayFinalOr
-            elif(character == "~"):
+            elif(character == '~'):
                 nodeC1 = Nodes.pop()
                 nodeC2 = Nodes.pop()
                 annullableC2 = nodeC2.getAnnullable()
@@ -253,7 +253,7 @@ class DirectAFDWords:
             list: los estados pertenecientes a nextPos del nodo en cuestion
         """
         # si es character, retorna el mismo id, esa es su primera pos
-        if(character == "~"):
+        if(character == '~'):
             nodeC1 = Nodes.pop()
             nodeC2 = Nodes.pop()
 
@@ -342,7 +342,7 @@ class DirectAFDWords:
         lastId = self.getAcceptingStatesAFD()
 
         filename='direct-afd'
-        file_name = 'graphs-direct/'+filename
+        file_name = 'graphs-direct-words/'+filename
         dot = Digraph('finite_state_machine',comment=filename, format="png")
         dot.attr(rankdir='LR', size='8,8')
         dot.attr('node', style='filled',color='plum2') #,color='lightgrey'
@@ -356,7 +356,7 @@ class DirectAFDWords:
             if(len(x[1]) > 0 and len(x[3]) > 0):
                 estado1 = self.getStateNumberFromArray(x[1])
                 esatdo2 = self.getStateNumberFromArray(x[3])
-                dot.edge(str(estado1), str(esatdo2), x[2])
+                dot.edge(str(estado1), str(esatdo2), str(x[2]))
         dot.attr(label=r'\n'+filename, fontsize='20')
         dot.render(filename=file_name, view=True)
 
@@ -366,7 +366,7 @@ class DirectAFDWords:
         """
         # acá se construye el arbol
         for postfixValue in self.expresionPostfix:
-            if(self.functions.isOperand(postfixValue)):  # * si es una letra
+            if(self.functions.isOperandV2(postfixValue)):  # * si es una letra
                 if(postfixValue == "ε"):  # si es un 'ε' entonces no se le agrega numeración
                     nodeFirstPos = ""
                     nodeLastPos = ""
@@ -421,7 +421,7 @@ class DirectAFDWords:
                 self.nodesArray.append(nodeOr)  # se agrega el nodo en cuestion
 
             # el AND NO tiene numero
-            elif(postfixValue == "~"):  
+            elif(postfixValue == '~'):  
                 nodeAndAnulable = ""
                 nodeAndfirstPos = ""
                 nodeAndlastPos = ""

@@ -69,12 +69,16 @@ class Cocor:
 
         self.charactersInFile = {}
         self.charactersInFileSubs2 = {}
+
         self.keyWordsInFile = {}
+
         self.tokensInFile = {}
         self.tokensConvertionInFile = {}
         self.tokensReadyForPosFix = {}
         self.tokensPosFixInFile = {}
         #self.productionsInFile = {}
+
+        self.finalExpression = {}
 
         self.test_patterns = []
 
@@ -472,13 +476,13 @@ class Cocor:
             else:
                 subs_char_def.append(letter_range)
         else:
-            any_word = char_def[i]
+            any_word = set(char_def[i])
             i += 1
             if(i < len(char_def)):
                 i,chr_result_operations = self.setOperations(i,char_def,any_word)
                 subs_char_def.append(chr_result_operations)
             else:
-                subs_char_def.append(any_word)
+                subs_char_def.append([any_word])
 
         return i, subs_char_def
 
@@ -528,11 +532,16 @@ class Cocor:
         return  dict_result
 
     def charactersSubstitution(self):
+        """funcion que sustituye caracteres
+        """
         charactersInFileSubs0 = {}
         charArray = []
         # ciclo para convertir los strings en arrays que encapsulen cada operando (item) de la expresion del caracter
         for key, char_def in self.charactersInFile.items():
             new_char_def = []
+            has_space_char = False
+            #if ' ' in char_def or " " in char_def:
+            #    has_space_char = True
             ss = char_def.split(' ')
             for i in ss:
                 if (len(i) > 0):
@@ -570,17 +579,26 @@ class Cocor:
                             elif(c == 0):
                                 new_char_def.append(definition)'''
                     
+            if("'" in new_char_def):
+                ind = new_char_def.index("'")
+                if(ind+1 < len(new_char_def)):
+                    obj_ind2 = new_char_def[ind+1]
+                    if(obj_ind2 == "'"):
+                        new_char_def.pop(ind)
+                        new_char_def.pop(ind)
+                        new_char_def.insert(ind,'CHR(32)')
+            if key == 'operadores' or key == 'operators':
+                new_char_def[0] = new_char_def[0] + '='
             charactersInFileSubs0[key] = new_char_def
 
         #print(':\\\\.')
         #print('"\'"')
         #print('\'"\'')
 
-        print('')
-
+        #print('')
         charactersInFileSubs1 = self.dictSubstitionItself(charactersInFileSubs0)
 
-        print('')
+        #print('')
 
         #self.charactersInFileSubs2 = charactersInFileSubs1
 
@@ -629,7 +647,7 @@ class Cocor:
 
 
         #print(self.charactersInFileSubs2['files'][0])
-        print('')
+        #print('')
 
 
 # ZONA DE TRATAMIENTO DE TOKENS -----------------------------------------------------------------------
@@ -698,9 +716,11 @@ class Cocor:
                 self.tokensConvertionInFile[key] = expString
             expArray = []
 
-        print('')
+        #print('')
 
-    def tokensToPostfix(self):
+    def tokensPreparationPostfix(self):
+        """funcion que prepara las expresiones para ser convertidas a formato postfix ya que estan en infix
+        """
         expOpArray = []
         except_arr = []
         for key, tokens_exp in self.tokensConvertionInFile.items():
@@ -737,24 +757,60 @@ class Cocor:
             expOpArray = []
             except_arr = []
 
-        print('')
+        #print('')
 
+        #! esta conversion se hara luego de hacer el OR entre expresiones en orBetweenExpresions()
         #for key, exp in self.tokensReadyForPosFix.items():
         #    self.tokensPosFixInFile[key] =  self.objToPostfix.infix_to_postfix(exp)
 
 
+    def orBetweenExpresions(self):
+        exp_final = []
+        #exp_curr = []
+        for key, exp in self.tokensReadyForPosFix.items():
+            exp.insert(0,'(')
+            exp += ['~','#',')']
+            exp.append('|')
+            exp_final += exp
+
+        #Eliminamos el ultimo or | que no se necesita
+        exp_final.pop() 
+
+        ##print('')
+
+        exp_final_dict = {}
+        exp_final_dict['exp'] = exp_final
+
+        for key, exp in exp_final_dict.items():
+            self.finalExpression[key] =  self.objToPostfix.infix_to_postfix(exp)
+
+        ##print('')
+
+    def expresionSubstitutions(self):
+        """Expresion final postfix con sustituciones aplicadas
+        """
+        dict1 = self.finalExpression
+        dict2 = self.charactersInFileSubs2
+        self.tokensSubstitution = self.dictSubstitionOther(dict1,dict2)
+        #print('')
+
+        result = self.tokensSubstitution['exp']
+        return result
+
+
     def tokensSubstitution(self):
+        """Visualizar todas las expresiones infix sustituidas. 
+            Funciona bien sin correr orBeetweenExpressions antes
+        """
         dict1 = self.tokensReadyForPosFix
         dict2 = self.charactersInFileSubs2
         self.tokensSubstitution = self.dictSubstitionOther(dict1,dict2)
-        print('')
-
-        return 0
+        #print('')
 
 
     def fileContents(self):
         self.cocorToP1Convention()
-        self.tokensToPostfix()
+        self.tokensPreparationPostfix()
         print(self.charactersInFile)
         print(self.keyWordsInFile)
         print(self.tokensInFile)
@@ -765,73 +821,27 @@ class Cocor:
 
 #tests__________
 def main():
-    obj = Cocor()
-    obj.read_def_cfg('HexNumber.cfg')
-    obj.read_test_file()
+    '''obj = Cocor()
+
+    #obj.read_def_cfg('HexNumber.cfg')
+    #obj.read_def_cfg('Aritmetica.cfg')
+    #obj.read_def_cfg('Double.cfg')
+    obj.read_def_cfg('CoCoL.cfg')
+
+    obj.read_test_file('test_file.cfg')
+
     obj.charactersSubstitution()
     obj.cocorToP1Convention()
-    obj.tokensToPostfix()
-    obj.tokensSubstitution()
+    obj.tokensPreparationPostfix()
 
-    '''s = set([chr(char) for char in range(0,255)])
-    z = ''.join(s)
+    obj.orBetweenExpresions()
+    obj.expresionSubstitutions()
 
-    print(s)
-    print('')
-    print(z)'''
-
-    
-    
-    '''d = {
-        'letter': ['abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'],
-        'digit': ['0123456789'],
-        'hexdigit': ['digit', '+', 'BCDEF'],
-        'tab': ['CHR(9)'],
-        'eol': ['CHR(10)'],
-        'files': ['letter', '+', 'digit', '+', ':\\\\.'],
-        'chars': ['CHR(32)', '..', 'CHR(255)', '-', "'"],
-        'string': ['CHR(32)', '..', 'CHR(255)', '-', '"'],
-        'macros': ['ANY', '-', 'eol']
-    }
-
-    f = d
-    z = {}
-    for key,value in d.items():
-        i = 0
-        new_arr = []
-        while i < len(value):
-            val = value[i]
-            substitution = obj.functions.get_value_from_dict(value[i],f)
-            if(substitution !=None):
-                new_arr.append(substitution)
-            else:
-                new_arr.append(value[i])
-            i += 1
-        z[key] = new_arr
-
-    print('')'''
-
-
-
-    #obj.fileContents()
-
-    #i = ['a','s','..']
-    #e = '..'
-    #if(e in i): print(True)
+    #!correr obiando las 3 funciones anteriores para pruebas
+    #obj.tokensSubstitution() '''
 
 
 if __name__ == "__main__":
     main()
-
-
-
-'''
-ident=letter{letter|digit} EXCEPT KEYWORDS.
-number=digit{digit}.
-hexnumber="0x"hexdigit{hexdigit}.
-float=digit{digit}'.'{digit}['E'['+'|'-']digit{digit}].
-space = whitespace{whitespace}.
-test = {digit|letter} digit letter letter.
-'''
 
 

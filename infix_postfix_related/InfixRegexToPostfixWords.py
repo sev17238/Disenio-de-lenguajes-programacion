@@ -62,7 +62,7 @@ class InfixRegexToPostfixWords:
         postfix_exp = []
         stack = []
 
-        #la expresion ya viene lista para pasarse a posfix
+        #!la expresion ya viene lista para pasarse a posfix
         eqRegex = expresion
 
         #formattedRegex = self.format_reg_ex(regex)
@@ -75,7 +75,8 @@ class InfixRegexToPostfixWords:
             elif(c == ')'):
                 #si el ultimo elemento de la pila es '(' 
                 while (stack[-1] != '('): 
-                    postfix += stack.pop()
+                    #postfix += stack.pop()
+                    postfix_exp.append(stack.pop())
 
                 stack.pop();
             else:
@@ -87,7 +88,8 @@ class InfixRegexToPostfixWords:
                     #print(str(peekedCharPrecedence)+' '+str(currentCharPrecedence))
 
                     if(peekedCharPrecedence >= currentCharPrecedence):
-                        postfix += stack.pop()
+                        #postfix += stack.pop()
+                        postfix_exp.append(stack.pop())
                     else:
                         break
 
@@ -95,15 +97,20 @@ class InfixRegexToPostfixWords:
 
 
         while(len(stack) > 0):
-            postfix += stack.pop()
+            #postfix += stack.pop()
+            postfix_exp.append(stack.pop())
 
-        if(postfix.find('(') != -1):
-            postfix = 'ERROR_POSTFIX_)'
+        #if(postfix.find('(') != -1):
+        if('(' in postfix_exp):
+            #postfix = 'ERROR_POSTFIX_)'
+            postfix_exp = ['ERROR_POSTFIX_)']
 
-        print(' - infixEq     = '+eqRegex)
+        #print(' - infixEq     = '+str(eqRegex))
+        print(' - infixEq     = '+''.join(eqRegex))
         #print('postfix   = '+postfix)
-        return postfix.replace('..','~')
+        print(' - postfix     = '+''.join(postfix_exp))
 
+        return postfix_exp
 
 # Main______________________________________________
 def main():
