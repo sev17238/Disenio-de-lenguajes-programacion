@@ -2,7 +2,7 @@
 # Diego Sevilla
 # 17238
 ######################################################
-# Cocol.py
+# Cocor.py
 ######################################################
 
 #imports
@@ -105,7 +105,6 @@ class Cocor:
                 line = line.rstrip()
                 line.rstrip()
                 if not(line.startswith('(.')) and len(line) > 0:
-                    
                     if(line.startswith('CHARACTERS')):
                         header = 'CHARACTERS'
                     elif(line.startswith('KEYWORDS')):
@@ -277,7 +276,7 @@ class Cocor:
             q = "'"
         word_set = []
         c += 1
-        word_set.append(q)
+        word_set.append(q) #no se necesita que este la comilla o apostrofe del principio
         while c < len(tokens_exp):
             forwardOr = False
             if c+1 < (len(tokens_exp)):
@@ -292,9 +291,10 @@ class Cocor:
                 else:
                     word_set.append(tokens_exp[c])
                     c += 1
-                #continue
+                #continues
             elif tokens_exp[c] == q:
-                word_set.append(tokens_exp[c])
+                #no se necesita que este la comilla o apostrofe del final
+                word_set.append(tokens_exp[c]) 
                 c += 1
                 break
             else:
@@ -333,7 +333,7 @@ class Cocor:
             q = "'"
         word_set = []
         c += 1
-        word_set.append(q)
+        word_set.append(q) #no se necesita que este la comilla o el apostrofe dentro del string
         while c < len(tokens_exp):
             if tokens_exp[c] == q:
                 word_set.append(tokens_exp[c])
@@ -342,7 +342,33 @@ class Cocor:
             else:
                 word_set.append(tokens_exp[c])
                 c += 1
-        expArray.append(''.join(word_set))
+
+        #print('')
+        
+        itemsCount = 0
+        expTempArray = []
+        for i in word_set:
+            if i not in '\'"':
+                if(itemsCount > 0):
+                    expArray.append(set(i))
+                    expArray.append('~')
+                else:
+                    expArray.append(set(i))
+                    expArray.append('~')
+                    expTempArray.append(set(i))
+                itemsCount += 1
+
+        if len(expTempArray) == 0:
+            if(word_set.count("'") > word_set.count('"')):
+                expArray.append(set('"'))
+            elif(word_set.count("'") < word_set.count('"')):
+                expArray.append(set("'"))
+        else:
+            #sacamos el ultimo operador de concatenacion que esta demas
+            if(itemsCount > 0):
+                expArray.pop() 
+                
+        #expArray.append(''.join(word_set))
         return expArray, c 
 
     def alphaNumericIterator(self,tokens_exp,c,expArray,considerOr=True):
@@ -685,7 +711,7 @@ class Cocor:
                 elif(tokens_exp[c] in "})]"):
                     print('Revisar cerraduras de apertura en la expresion')
                 else:
-                    l = 0
+                    c += 1
                     print('else')
 
             finalExpArray = []
@@ -746,13 +772,8 @@ class Cocor:
                 elif(tokens_exp_new[c] in "'\""):
                     expOpArray, c = self.intoQuotationsApostrophesV2(tokens_exp_new,c,expOpArray)
                 else:
-                    l = 0
-                    print('else')
-
-            expOpArray.insert(0,'(')
-            expOpArray.append(')')
-            expOpArray.append('~')
-            expOpArray.append('$')
+                    print(tokens_exp_new[c])
+                    #print('else')
 
             if(len(except_arr) == 0):
                 self.tokensReadyForPosFix[key] = expOpArray
@@ -768,7 +789,6 @@ class Cocor:
         #for key, exp in self.tokensReadyForPosFix.items():
         #    self.tokensPosFixInFile[key] =  self.objToPostfix.infix_to_postfix(exp)
 
-        #print('')
 
     def orBetweenExpresions(self):
         exp_final = []
@@ -827,7 +847,7 @@ class Cocor:
 
 #tests__________
 def main():
-    '''obj = Cocor()
+    obj = Cocor()
 
     #obj.read_def_cfg('HexNumber.cfg')
     #obj.read_def_cfg('Aritmetica.cfg')
@@ -844,7 +864,7 @@ def main():
     obj.expresionSubstitutions()
 
     #!correr obiando las 3 funciones anteriores para pruebas
-    #obj.tokensSubstitution() '''
+    #obj.tokensSubstitution() 
 
 
 if __name__ == "__main__":

@@ -35,6 +35,9 @@ class DirectAFDWords:
         self.resultAFD = {}
         self.resultAFDArray = []
         # variables para el AFN
+
+        self.acceptingStatesOfEachExp = []
+        self.fileName = 'afd_direct'
         
     def getPosFromCharacter(self, character):
         """
@@ -53,11 +56,14 @@ class DirectAFDWords:
         Returns:
             list: el estado final de nextPos
         """
+        accepting_states = []
         for num, value in self.nextPosDict.items():
             if len(value) == 0:
-                return num
+                accepting_states.append(num)
+                #return num
 
-        return ""
+        self.acceptingStatesOfEachExp = accepting_states
+        return accepting_states
 
     def getAcceptingStatesAFD(self):
         """Obtenemos estados de aceptacion del AFD
@@ -67,8 +73,10 @@ class DirectAFDWords:
         """
         arrayValores = []
         for value in self.resultAFDArray:
-            if(str(self.getFinalStateId()) in value[1]):
-                arrayValores.append(value[0])
+            finalstates = self.getFinalStateId()
+            for fstate in finalstates:
+                if(str(fstate) in value[1]):
+                    arrayValores.append(value[0])
 
         return arrayValores
 
@@ -298,6 +306,7 @@ class DirectAFDWords:
         end_time = time.perf_counter()
         lastId = self.getAcceptingStatesAFD()
 
+        print('acceptings states lenght: '+str(len(lastId)))
         if(len(s) > 0):
             if(s[0] in lastId):
                 print('-------------------------------------------------')
@@ -321,6 +330,7 @@ class DirectAFDWords:
             print('Tiempo transcurrido: '+str(total_time))
             print('-------------------------------------------------')
 
+
     def move(self, estado, character):
         """Representacion de la funcion mover en la implementacion
         """
@@ -341,16 +351,17 @@ class DirectAFDWords:
         drawArray = self.resultAFDArray
         lastId = self.getAcceptingStatesAFD()
 
-        filename='direct-afd'
+        filename=self.fileName
         file_name = 'graphs-direct-words/'+filename
         dot = Digraph('finite_state_machine',comment=filename, format="png")
-        dot.attr(rankdir='LR', size='8,8')
+        dot.attr(rankdir='LR', size='128,128')
         dot.attr('node', style='filled',color='plum2') #,color='lightgrey'
 
         # se agrega el nodo de aceptacion
         dot.attr('node', shape='doublecircle')
         for x in lastId:
            dot.node(str(x))
+
         dot.attr('node', shape='circle')
         for x in drawArray:
             if(len(x[1]) > 0 and len(x[3]) > 0):
@@ -495,4 +506,4 @@ class DirectAFDWords:
                         self.resultAFDArray.append([counter, internalState, tokenn, nextPosID])
 
         self.drawAFD()
-        self.simAFD()
+        #self.simAFD()

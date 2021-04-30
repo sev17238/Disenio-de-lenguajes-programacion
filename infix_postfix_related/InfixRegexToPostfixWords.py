@@ -62,21 +62,14 @@ class InfixRegexToPostfixWords:
         postfix_exp = []
         stack = []
 
-
         #!la expresion ya viene lista para pasarse a posfix
         eqRegex = expresion
 
         #formattedRegex = self.format_reg_ex(regex)
         #eqRegex = self.replace_cases_with_equivalents(formattedRegex)
-        
-        if('EXCEPT KEYWORDS' in expresion[1]):
-            eqRegex = expresion[0]
-        else:
-            eqRegex = expresion
 
-        #c puede ser tanto un posible token como un operador
-        for counter in range(len(eqRegex)):
-            c = eqRegex[counter]
+        for cc in range(len(eqRegex)):
+            c = eqRegex[cc]
             if (c == '('):
                 stack.append(c)
             elif(c == ')'):
@@ -108,22 +101,16 @@ class InfixRegexToPostfixWords:
             postfix_exp.append(stack.pop())
 
         #if(postfix.find('(') != -1):
-
         if('(' in postfix_exp):
             #postfix = 'ERROR_POSTFIX_)'
             postfix_exp = ['ERROR_POSTFIX_)']
 
-        #print(' - infixEq     = '+str(eqRegex))
+        print(' - infixEq     = '+str(eqRegex))
+        #print(' - infixEq     = '+''.join(eqRegex))
 
-        print(' - infixEq     = '+''.join(eqRegex))
         #print('postfix   = '+postfix)
-        print(' - postfix     = '+''.join(postfix_exp))
-
-        if '~~' in postfix_exp:
-            for counter in len(postfix_exp):
-                item = postfix_exp[counter]
-                if item == '~~':
-                    postfix_exp[counter] = '~'
+        print(' - postfix     = '+str(postfix_exp))
+        #print(' - postfix     = '+''.join(postfix_exp))
 
         return postfix_exp
 

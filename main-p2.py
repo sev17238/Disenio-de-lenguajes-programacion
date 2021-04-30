@@ -15,8 +15,11 @@ sys.path.append(".")
 from infix_postfix_related.InfixRegexToPostfixWords import InfixRegexToPostfixWords
 from direct.DirectAFDWords import DirectAFDWords
 from cocor.Cocor import Cocor
+
+from cocor.Scanner import Scanner
 from functions import functions
 import collections
+import pickle
 
 
 # functions ________________________
@@ -46,9 +49,9 @@ while True:
 
     if(option == '1'):
         def_file = input('Ingrese el nombre del archivo con las definiciones (Aritmetica.cfg): ')
-        test_file = input('Ingrese el nombre del archivo de prueba (test_file.cfg): ')
+        
         coco_obj.read_def_cfg(def_file)
-        coco_obj.read_test_file(test_file)
+        #coco_obj.read_test_file(test_file)
 
         coco_obj.charactersSubstitution()
         coco_obj.cocorToP1Convention()
@@ -76,23 +79,13 @@ while True:
             objdirect = DirectAFDWords(tokens,chain,postfixRegex)
             AFD = objdirect.generateDirectAFD()
 
+            # Its important to use binary mode
+            store_transitions = open('cocor/scanner', 'ab')
+            # source, destination
+            pickle.dump(objdirect, store_transitions)                     
+            store_transitions.close()
+
     elif(option == '3'):
-        if(postfixRegex == ['ERROR_POSTFIX_)']):
-            print('\n ")" faltante en la expresion regular ingresdigit. Vuelva a intentar. \n')
-        else:
-            print(' - postfix     = '+ str(postfixRegex))
-            tokens = functions.getRegExUniqueTokensV2(postfixRegex)
-            print(' - alfabeto (tokens): '+str(tokens))
-
-            #chain = 'digit letter digit letter letter'
-            chain = 'ababb'
-
-            objdirect = DirectAFDWords(tokens,chain,postfixRegex)
-            AFD = objdirect.generateDirectAFD()
-
-            
-
-    elif(option == '4'):
         print('\nAdios! ')
         break
     else:

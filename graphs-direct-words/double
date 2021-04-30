@@ -1,0 +1,24 @@
+// double
+digraph finite_state_machine {
+	rankdir=LR size="128,128"
+	node [color=plum2 style=filled]
+	node [shape=doublecircle]
+	1
+	1
+	1
+	3
+	3
+	3
+	5
+	5
+	5
+	node [shape=circle]
+	0 -> 3 [label="{'3', '0', '6', '8', '1', '4', '9', '5', '7', '2'}"]
+	0 -> 1 [label="{'\r', '\t', '\n', ' '}"]
+	1 -> 1 [label="{'\r', '\t', '\n', ' '}"]
+	3 -> 3 [label="{'3', '0', '6', '8', '1', '4', '9', '5', '7', '2'}"]
+	3 -> 4 [label="{'.'}"]
+	4 -> 5 [label="{'3', '0', '6', '8', '1', '4', '9', '5', '7', '2'}"]
+	5 -> 5 [label="{'3', '0', '6', '8', '1', '4', '9', '5', '7', '2'}"]
+	fontsize=20 label="\ndouble"
+}
