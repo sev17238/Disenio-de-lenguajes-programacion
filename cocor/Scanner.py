@@ -26,7 +26,7 @@ class Scanner:
     para reconocer los tokens en el archivo de prueba.
     """
     def __init__(self,testFile = 'test_file.txt'):
-        self.scanner = pickle.load(open('cocor/scanner'+testFile[:-4].lower(),'rb'))
+        self.scanner = pickle.load(open('cocor/scanner'+testFile[:-4]+'.scann'.lower(),'rb'))
         #self.acceptingStatesDict = pickle.load(open('cocor/accADict','rb'))
         self.resultAFDArray = self.scanner.resultAFDArray
         self.acceptingStatesOfEachExp = self.scanner.acceptingStatesOfEachExp

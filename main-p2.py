@@ -81,7 +81,7 @@ while True:
             AFD = objdirect.generateDirectAFD()
 
             # Its important to use binary mode
-            store_transitions = open('cocor/scanner'+def_file[:-4].lower(), 'ab')
+            store_transitions = open('cocor/scanner'+def_file[:-4]+'.scann'.lower(), 'ab')
             # source, destination
             pickle.dump(objdirect, store_transitions)                     
             store_transitions.close()

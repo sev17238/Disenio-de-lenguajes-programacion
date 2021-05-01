@@ -23,7 +23,12 @@ Herramientas utilizadas en el proyecto:
 3. Correr el archivo `main.py` para proyecto 1.
 4. Correr el archivo `main-p2.py` y `Scanner.py` para proyecto 2.
 
-## Interfaz de usuario
+## Flujo de prueba proyecto 2
+ * Al leer un Archivo.cfg(ATG) con `main-p2.py` se generara su respectivo scanner `(scannerarchivo.scann)`
+ * Luego `Scanner.py` tomara `scannerarchivo.scann` y lo usara para identificar
+   los tokens en el archivo de prueba `archivo.txt`.
+   
+### Interfaz de usuario
 
 main-p2.py
 ```
@@ -52,6 +57,8 @@ Seleccione una opcion.
 Ingrese una opcion: 2
 Ingrese el nombre del archivo de prueba (Ej. aritmetica.txt): aritmetica.txt
 ```
+
+
 
 ## Notas
 1. Directorios con prefijo `graphs-` contienen algunos de los automatas de salida obtenidos
