@@ -42,6 +42,7 @@ coco_obj = Cocor()
 functions = functions()
 
 postfixRegex = []
+def_file = ''
 while True:
 
     menu()

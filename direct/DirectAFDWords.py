@@ -37,6 +37,7 @@ class DirectAFDWords:
         # variables para el AFN
 
         self.acceptingStatesOfEachExp = []
+        self.acceptingStatesDict = {}
         self.fileName = 'afd_direct'
         
     def getPosFromCharacter(self, character):
@@ -400,6 +401,9 @@ class DirectAFDWords:
                     node.setCaracterNodo(postfixValue)
                     node.setNodoId(str(self.globalCounter))
                     self.nextPosDict[self.globalCounter] = []
+
+
+
                     self.globalCounter += 1  # aumentamos el counter global
                     nodeFirstPos = [node]
                     nodeLastPos = [node]
