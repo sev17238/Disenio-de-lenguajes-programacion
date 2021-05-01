@@ -1,0 +1,58 @@
+_______________________________________________________________________________________________________
+Double.cfg - proyecto 1 vs proyecto 2 ------------------------------
+
+(d(d)*)|(d(d)*od(d)*)|(b(b)*)
+
+ - substEq     = ((d.(d)*)|(d.(d)*.o.d.(d)*)|(b.(b)*)).#
+ - postfix     = dd*.dd*.o.d.d*.|bb*.|#.
+ - alfabeto (tokens): ['d', 'o', 'b']
+
+
+(digit(digit)*)|(digit(digit)*'.'digit(digit)*)|(blanco(blanco)*)
+
+ - infixEq     = ['(', 'digit', '~', '(', 'digit', ')', '*', '~', '#', ')', '|', '(', 'digit', '~', '(', 'digit', ')', '*', '~', {'.'}, '~', 'digit', '~', '(', 'digit', ')', '*', '~', '#', ')', '|', '(', 'blanco', '~', '(', 'blanco', ')', '*', '~', '#', ')']
+ - postfix     = ['digit', 'digit', '*', '~', '#', '~', 'digit', 'digit', '*', '~', {'.'}, '~', 'digit', '~', 'digit', '*', '~', '#', '~', '|', 'blanco', 'blanco', '*', '~', '#', '~', '|']
+ - alfabeto (tokens): [{'9', '1', '0', '7', '2', '4', '5', '8', '6', '3'}, {'.'}, {'\n', '\t', ' ', '\r'}]
+
+__________________________________________________________________________________________________________
+Aritmetica.cfg - proyecto 1 vs proyecto 2 --------------------------
+
+(l(l|d)*)|(d(d)*)
+
+ - substEq     = ((l.(l|d)*)|(d.(d)*)).#
+ - postfix     = lld|*.dd*.|#.
+ - alfabeto (tokens): ['l', 'd']
+
+(letter(letter|digit)*)|(digit(digit)*)
+
+ - infixEq     = ['(', 'letter', '~', '(', 'letter', '|', 'digit', ')', '*', '~', '#', ')', '|', '(', 'digit', '~', '(', 'digit', ')', '*', '~', '#', ')']
+ - postfix     = ['letter', 'letter', 'digit', '|', '*', '~', '#', '~', 'digit', 'digit', '*', '~', '#', '~', '|']
+ - alfabeto (tokens): [{'M', 'q', 'S', 'Z', 'w', 'W', 'e', 'i', 'A', 'a', 'C', 'R', 'K', 'g', 'I', 'U', 'd', 'J', 't', 'v', 'c', 'Q', 'y', 'V', 'X', 'j', 'O', 'k', 'o', 'r', 'f', 'x', 'Y', 'N', 'n', 'H', 'u', 'P', 'E', 's', 'D', 'F', 'h', 'T', 'p', 'l', 'G', 'B', 'm', 'b', 'z', 'L'}, {'7', '4', '9', '2', '5', '3', '6', '8', '0', '1'}]
+
+
+__________________________________________________________________________________________________________
+HexNumber.cfg - proyecto 1 vs proyecto 2 ---------------------------
+
+(l(l|d)*)|(h(h)*x)|(d(d)*)|((s?)d(d)*)|(w(w)*)
+
+ - substEq     = ((l.(l|d)*)|(h.(h)*.x)|(d.(d)*)|((s|ε).d.(d)*)|(w.(w)*)).#
+ - postfix     = lld|*.hh*.x.|dd*.|sε|d.d*.|ww*.|#.
+ - alfabeto (tokens): ['l', 'd', 'h', 'x', 's', 'ε', 'w']
+
+(letter(letter|digit)*)|(hexdigit(hexdigit)*hexterm)|(digit(digit)*)|((sign|ε)digit(digit)*)|(whitespace(whitespace)*)
+
+ - infixEq     = ['(', 'letter', '~', '(', 'letter', '|', 'digit', ')', '*', '~', '#', ')', '|', '(', 'digit', '~', '(', 'digit', ')', '*', '~', '#', ')', '|', '(', 
+'hexdigit', '~', '(', 'hexdigit', ')', '*', '~', 'hexterm', '~', '#', ')', '|', '(', '(', 'sign', ')', '|', 'ε', '~', 'digit', '~', '(', 'digit', ')', '*', '~', '#', ')', '|', '(', 'whitespace', '~', '(', 'whitespace', ')', '*', '~', '#', ')']
+ - postfix     = ['letter', 'letter', 'digit', '|', '*', '~', '#', '~', 'digit', 'digit', '*', '~', '#', '~', '|', 'hexdigit', 'hexdigit', '*', '~', 'hexterm', '~', 
+'#', '~', '|', 'sign', 'ε', 'digit', '~', 'digit', '*', '~', '#', '~', '|', '|', 'whitespace', 'whitespace', '*', '~', '#', '~', '|']
+ - alfabeto (tokens): [{'j', 'i', 'b', 'x', 'o', 'f', 'h', 'r', 'd', 'l', 'k', 't', 'n', 'z', 'w', 'A', 'c', 'm', 'g', 'p', 'y', 'v', 'e', 'q', 's', 'u', 'a'}, {'2', '9', '6', '1', '5', '4', '3', '8', '0', '7'}, {'F', 'E', 'C', 'B', '2', '9', '6', '1', '5', '4', '3', '8', 'A', 'D', '0', '7'}, {'H'}, {'-', '+'}, 'ε', {'\n', '\t', '\r'}]
+
+__________________________________________________________________________________________________________
+CoCoL.cfg - proyecto 1 vs proyecto 2 -------------------------------
+Bastante extenso, puede haber errores en el 1 por typos**
+
+(l(l|d)*)|(cs(s)*c)|(A(S|ε)lA)|(Hd(d)*P)|(Hd(d)*PDHd(d)*P)|(m)|(p)|(q)
+
+
+(letter(letter|digit)*)|(comillas stringletter(stringletter)* comillas)|("'"("/"|ε)letter"'"))|
+("CHR("digit(digit)*")")|("CHR("digit(digit)*")" ".." "CHR("digit(digit)*")")|(MyANY)|("(.")|(".)")

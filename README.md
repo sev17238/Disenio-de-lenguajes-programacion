@@ -15,7 +15,7 @@ Proyecto 1 y 2
 Herramientas utilizadas en el proyecto:
 
 - :snake: **Python** — 3.8.5
-- :coffee: café negro
+- :coffee: **Café Negro**
 
 ## Instalación
 1. Clonar el repositorio con `https://github.com/sev17238/Disenio-de-lenguajes-programacion.git`
@@ -33,22 +33,32 @@ Seleccione una opcion.
         1. Leer archivos
         2. Metodo de Conversion Directa y generar scanner.py
         3. Salir
-Ingrese una opcion: Double.cfg
+Ingrese una opcion: 1
+Ingrese el nombre del archivo con las definiciones (Ej. Aritmetica.cfg): Aritmetica.cfg
+
+...
+
+Ingrese una opcion: 2
 ```
+
 Scanner.py
 ```
 -----------------------SCANNER------------------
 
 Seleccione una opcion.
         1. Leer archivo de prueba
-        2. Salir
-Ingrese una opcion: test_double.txt
+        2. Leer un solo string en archivo (pruebas)
+        4. Salir
+Ingrese una opcion: 2
+Ingrese el nombre del archivo de prueba (Ej. aritmetica.txt): aritmetica.txt
 ```
 
 ## Notas
 1. Directorios con prefijo `graphs-` contienen algunos de los automatas de salida obtenidos
    con los algoritmos de thompson, subconjuntos y conversion directa
-2. Directorio `graph-direct-words/` contiene una visualizacion de los automatas del proyecto 2.
+2. Directorio `graph-direct-words/` contiene una visualizacion de los automatas generados
+   a partir de las gramaticas definidas en los archivos del proyecto 2.
+3. Directorio `P1vsP2/` contiene comparaciones entre equivalencias del proyecto 1 y 2
    
 ## Referencias
  - Compilers: Principles, Techniques, & Tools. Second Edition.

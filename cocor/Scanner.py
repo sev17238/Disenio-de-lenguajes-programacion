@@ -25,8 +25,8 @@ class Scanner:
     """Archivo que utiliza las transiciones del AFD
     para reconocer los tokens en el archivo de prueba.
     """
-    def __init__(self,testFile = 'test_file.cfg'):
-        self.scanner = pickle.load(open('cocor/scanner','rb'))
+    def __init__(self,testFile = 'test_file.txt'):
+        self.scanner = pickle.load(open('cocor/scanner'+testFile[:-4].lower(),'rb'))
         #self.acceptingStatesDict = pickle.load(open('cocor/accADict','rb'))
         self.resultAFDArray = self.scanner.resultAFDArray
         self.acceptingStatesOfEachExp = self.scanner.acceptingStatesOfEachExp
@@ -107,7 +107,10 @@ class Scanner:
             for estado in estados:
                 if(estado == trans[0]):
                     for estadoInd in trans[1]:
-                        if(int(estadoInd) in self.acceptingStatesOfEachExp):
+                        acc1 = self.acceptingStatesOfEachExp
+                        acc2 = self.getAcceptingStatesAFD()
+                        #if(int(estadoInd) in acc1):
+                        if(int(estadoInd) in acc2):
                             token = trans[2]
                             return token
         return token
@@ -188,9 +191,49 @@ class Scanner:
         """Simulacion del AFD de resultado
         """
         s = [0]
-        for x in self.line_to_read:
-            s = self.move(s, x)
-        lastId = self.getAcceptingStatesAFD()
+        s2 = [0]
+        counter = 0
+        token_construction = ''
+
+        while counter < len(self.line_to_read)-1:
+            curr_char = self.line_to_read[counter]
+            next_char = self.line_to_read[counter+1]
+            s = self.move(s, curr_char)
+            s2 = self.move(s, next_char)
+            token_construction += curr_char
+
+            #si el caracter siguiente es cero, entonces ahi debemos parar de evaluar una cadena
+            if(len(s) > 0 and len(s2) == 0): # 
+                token = self.getTokenNonExplicitIdentifier(s)
+                lastId = self.getAcceptingStatesAFD()
+                if(len(token) == 0):
+                #if(S[0] not in lastId):
+                    print('Invalid token: ', token_construction)
+                    s = [0]
+                    s2 = [0]
+                    token_construction = ""
+                else:
+                    if s[0] in lastId:
+                        print('La cadena '+token_construction+' fue aceptada por el AFD.')
+                    else: 
+                        print('La cadena '+token_construction+' NO fue aceptada por el AFD.')
+
+                    print('token: '+ token_construction + ' has type: '+str(token))
+                    s = [0]
+                    s2 = [0]
+                    token_construction = ""
+                print('Invalid token: --> '+ str(curr_char)+' <--')
+            #si el caracter actual es cero entonces el token es invalido.
+            else:
+                print('La cadena '+token_construction+' NO fue aceptada por el AFD.')
+                print('Invalid token: ', token_construction)
+                S = [0]
+                S_next = [0]
+                token_construction = ""
+            
+            counter +=1
+        
+        '''lastId = self.getAcceptingStatesAFD()
 
         if(len(s) > 0):
             if(s[0] in lastId):
@@ -204,7 +247,7 @@ class Scanner:
         else:
             print('-------------------------------------------------')
             print('La cadena '+self.line_to_read+' NO fue aceptada por el AFD.')
-            print('-------------------------------------------------')
+            print('-------------------------------------------------')'''
 
 
     def simulation(self):
@@ -226,7 +269,7 @@ class Scanner:
         S_next = [0]
 
         #construccion de la cadena leida
-        accumulator = ""
+        token_construction = ""
         #acumulador de estados
         string_array = []
         #estado de aceptacion
@@ -244,48 +287,48 @@ class Scanner:
         while len(string_array) > 0:
             if(counter == len(self.line_to_read)-1):
                 characterToEvaluate = self.line_to_read[counter]
-                accumulator += characterToEvaluate
+                token_construction += characterToEvaluate
                 S = self.move(S,characterToEvaluate)
                 token = self.getTokenNonExplicitIdentifier(S)
                 #lastId = self.getAcceptingStatesAFD()
                 if(len(token) == 0):
                 #if(S[0] not in lastId):
-                    print('Invalid token: ', accumulator)
+                    print('Invalid token: ', token_construction)
                     break
-                else:
-                    print('token: '+ accumulator + ' has type: '+str(token))
-                    break
+                print('token: '+ token_construction + ' has type: '+str(token))
             characterToEvaluate = self.line_to_read[counter]
             nextCharacterToEvaluate = self.line_to_read[counter+1]
-            accumulator += characterToEvaluate
+            token_construction += characterToEvaluate
             S = self.move(S,characterToEvaluate)
             S_next = self.move(S,nextCharacterToEvaluate)
 
             # Este caso se da cuando a travez del siguiente token ya no hay 
             # transicion hacia otro estado
-            if(len(S_next) == 0 and len(S) > 0):
+            if(len(S) > 0 and len(S_next) == 0):  
                 token = self.getTokenNonExplicitIdentifier(S)
                 #lastId = self.getAcceptingStatesAFD()
                 if(len(token) == 0):
                 #if(S[0] not in lastId):
-                    print('Invalid token: ', accumulator)
+                    print('Invalid token: ', token_construction)
                     S = [0]
                     S_next = [0]
-                    accumulator = ""
+                    token_construction = ""
+                    counter -= 1
                 else:
-                    print('token: '+ accumulator + ' has type: '+str(token))
+                    print('token: '+ token_construction + ' has type: '+str(token))
                     S = [0]
                     S_next = [0]
-                    accumulator = ""
-            else:
-                print('Invalid token: ', accumulator)
+                    token_construction = ""
+            elif(len(S) == 0):
+                print('Invalid token: ', token_construction)
                 S = [0]
                 S_next = [0]
-                accumulator = ""
+                token_construction = ""
 
             counter += 1
             character_popping = string_array.pop()
-        return 0
+
+        print('')
 
 # tests__________
 
@@ -299,7 +342,9 @@ def menu():
     #os.system('cls')
     print("Seleccione una opcion.")
     print("\t1. Leer archivo de prueba")
-    print("\t2. Salir")
+    print("\t2. Leer un solo string en archivo (pruebas)")
+    #print("\t3. Leer archivo de pruebaa (pruebas)")
+    print("\t4. Salir")
 
 def main():
     welcome()
@@ -309,17 +354,29 @@ def main():
         option = input('Ingrese una opcion: ')
 
         if(option == '1'):
-            file_name = str(input("Ingrese el nombre del archivo de prueba(test_file.txt): "))
+            file_name = str(input("Ingrese el nombre del archivo de prueba (Ej. aritmetica.txt): "))
             obj = Scanner(file_name)
             obj.read_test_file()
-            #obj.simulationTest()
             obj.simulation()
 
         elif(option == '2'):
+            file_name = str(input("Ingrese el nombre del archivo de prueba (Ej. aritmetica.txt): "))
+            obj = Scanner(file_name)
+            obj.read_test_file()
+            obj.simulationTest()
+            #obj.simulationV1()
+
+        #elif(option == '3'):
+        #    file_name = str(input("Ingrese el nombre del archivo de prueba (Ej. aritmetica.txt): "))
+        #    obj = Scanner(file_name)
+        #    obj.read_test_file()
+        #    obj.simulationV1()
+
+        elif(option == '4'):
             print('\nAdios! ')
             break
         else:
-            input('No se ha elejido ninguna opcion en el menu. Intentalo otrdigitz! Presiona Enter!')
+            input('No se ha elejido ninguna opcion en el menu. Intentalo de nuevo! Enter -->')
 
 
 if __name__ == "__main__":

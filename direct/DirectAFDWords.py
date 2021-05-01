@@ -378,7 +378,7 @@ class DirectAFDWords:
         """
         # acá se construye el arbol
         for postfixValue in self.expresionPostfix:
-            if(self.functions.isOperandV2(postfixValue)):  # * si es una letra
+            if(self.functions.isOperandV2(postfixValue)): # letra
                 if(postfixValue == "ε"):  # si es un 'ε' entonces no se le agrega numeración
                     nodeFirstPos = ""
                     nodeLastPos = ""

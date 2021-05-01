@@ -49,7 +49,7 @@ while True:
     option = input('Ingrese una opcion: ')
 
     if(option == '1'):
-        def_file = input('Ingrese el nombre del archivo con las definiciones (Aritmetica.cfg): ')
+        def_file = input('Ingrese el nombre del archivo con las definiciones (Ej. Aritmetica.cfg): ')
         
         coco_obj.read_def_cfg(def_file)
         #coco_obj.read_test_file(test_file)
@@ -81,7 +81,7 @@ while True:
             AFD = objdirect.generateDirectAFD()
 
             # Its important to use binary mode
-            store_transitions = open('cocor/scanner', 'ab')
+            store_transitions = open('cocor/scanner'+def_file[:-4].lower(), 'ab')
             # source, destination
             pickle.dump(objdirect, store_transitions)                     
             store_transitions.close()
@@ -90,6 +90,6 @@ while True:
         print('\nAdios! ')
         break
     else:
-        input('No se ha elejido ninguna opcion en el menu. Intentalo otrdigitz! Presiona Enter!')
+        input('No se ha elejido ninguna opcion en el menu. Intentalo otrdigitz! Enter -->')
 
 
