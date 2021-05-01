@@ -27,7 +27,7 @@ Herramientas utilizadas en el proyecto:
  * Al leer un Archivo.cfg(ATG) con `main-p2.py` se generara su respectivo scanner `(scannerarchivo.scann)`
  * Luego `Scanner.py` tomara `scannerarchivo.scann` y lo usara para identificar
    los tokens en el archivo de prueba `archivo.txt`.
-   
+
 ### Interfaz de usuario
 
 main-p2.py
@@ -72,7 +72,7 @@ Ingrese el nombre del archivo de prueba (Ej. aritmetica.txt): aritmetica.txt
  - https://www.geeksforgeeks.org
  - https://www.w3schools.com
 
-You tube
+## Video en You tube
  - https://www.youtube.com/watch?v=saJP_B_sPc
 
 ## Agradecimientos
