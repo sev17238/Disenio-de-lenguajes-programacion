@@ -25,8 +25,8 @@ import pickle
 # functions ________________________
 
 def welcome():
-    print("Coco/R tests")
-    print()
+    print("\n-----------------------Coco/R tests------------------")
+    print("Welcome!!")
 
 def menu():
     #os.system('cls')
@@ -42,6 +42,7 @@ coco_obj = Cocor()
 functions = functions()
 
 postfixRegex = []
+def_file = ''
 while True:
 
     menu()

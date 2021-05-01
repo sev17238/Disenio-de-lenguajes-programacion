@@ -132,7 +132,6 @@ dmypy.json
 #Custom log and test files
 logs/
 ref/
-tests/
 
 graphs-subsets/
 graphs-thompson/
@@ -141,4 +140,3 @@ graphs-direct/
 *tests.py
 *test.py
 
-*.txt
