@@ -73,7 +73,7 @@ Ingrese el nombre del archivo de prueba (Ej. aritmetica.txt): aritmetica.txt
  - https://www.w3schools.com
 
 ## Video en You tube
- - https://www.youtube.com/watch?v=saJP_B_sPc
+ - https://youtu.be/MvnzB2JKPns
 
 ## Agradecimientos
  - Prof. Bidkar Pojoy

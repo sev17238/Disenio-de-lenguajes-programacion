@@ -36,6 +36,7 @@ class Scanner:
         self.testFile = 'tests\\'+testFile
         self.line_to_read = ''
 
+
     def read_test_file(self):
         """Funcion para leer el archivo de prueba 
             y almacenar sus contenidos.
@@ -57,6 +58,14 @@ class Scanner:
 
 
     def getStateId(self, states_list):
+        """Regresara el identificador del estado
+
+        Args:
+            states_list (list): lista de estados
+
+        Returns:
+            int: el estado
+        """
         for value in self.resultAFDArray:
             if(value[1] == states_list):
                 return value[0]
@@ -89,6 +98,17 @@ class Scanner:
 
 
     def getTokenExplicitIdentifier(self, estados):
+        """Funcion que retornara el identificador explicito 
+        del token en cuestion. Retornara el lado izquierdo
+        de la expresion. Ej. number = digit(digit)*
+
+        Args:
+            estados (list): lista de estados
+
+        Returns:
+            set: el set con los posibles caracteres pertenecientes
+            a ese token particular
+        """
         token = ""
         for trans in self.resultAFDArray:
             for estado in estados:
@@ -102,6 +122,17 @@ class Scanner:
         return token
 
     def getTokenNonExplicitIdentifier(self, estados):
+        """Funcion que retornara el identificador no explicito 
+        del token en cuestion. Retornara el lado derecho
+        de la expresion. Ej. number = digit(digit)*
+
+        Args:
+            estados (list): lista de estados
+
+        Returns:
+            set: el set con los posibles caracteres pertenecientes
+            a ese token particular
+        """
         token = ""
         for trans in self.resultAFDArray:
             for estado in estados:
@@ -150,7 +181,8 @@ class Scanner:
         return new_states_array
 
     def getAcceptingStatesAFD(self):
-        """Obtenemos estados de aceptacion del AFD
+        """Obtenemos estados de aceptacion 
+        del AFD
 
         Returns:
             list: los estados de aceptacion del afd
@@ -185,70 +217,6 @@ class Scanner:
             print('-------------------------------------------------')
             print('La cadena '+self.line_to_read+' NO fue aceptada por el AFD.')
             print('-------------------------------------------------')
-
-
-    def simulationV1(self):
-        """Simulacion del AFD de resultado
-        """
-        s = [0]
-        s2 = [0]
-        counter = 0
-        token_construction = ''
-
-        while counter < len(self.line_to_read)-1:
-            curr_char = self.line_to_read[counter]
-            next_char = self.line_to_read[counter+1]
-            s = self.move(s, curr_char)
-            s2 = self.move(s, next_char)
-            token_construction += curr_char
-
-            #si el caracter siguiente es cero, entonces ahi debemos parar de evaluar una cadena
-            if(len(s) > 0 and len(s2) == 0): # 
-                token = self.getTokenNonExplicitIdentifier(s)
-                lastId = self.getAcceptingStatesAFD()
-                if(len(token) == 0):
-                #if(S[0] not in lastId):
-                    print('Invalid token: ', token_construction)
-                    s = [0]
-                    s2 = [0]
-                    token_construction = ""
-                else:
-                    if s[0] in lastId:
-                        print('La cadena '+token_construction+' fue aceptada por el AFD.')
-                    else: 
-                        print('La cadena '+token_construction+' NO fue aceptada por el AFD.')
-
-                    print('token: '+ token_construction + ' has type: '+str(token))
-                    s = [0]
-                    s2 = [0]
-                    token_construction = ""
-                print('Invalid token: --> '+ str(curr_char)+' <--')
-            #si el caracter actual es cero entonces el token es invalido.
-            else:
-                print('La cadena '+token_construction+' NO fue aceptada por el AFD.')
-                print('Invalid token: ', token_construction)
-                S = [0]
-                S_next = [0]
-                token_construction = ""
-            
-            counter +=1
-        
-        '''lastId = self.getAcceptingStatesAFD()
-
-        if(len(s) > 0):
-            if(s[0] in lastId):
-                print('-------------------------------------------------')
-                print('La cadena '+self.line_to_read+' fue aceptada por el AFD.')
-                print('-------------------------------------------------')
-            else:
-                print('-------------------------------------------------')
-                print('La cadena '+self.line_to_read+' NO fue aceptada por el AFD.')
-                print('-------------------------------------------------')
-        else:
-            print('-------------------------------------------------')
-            print('La cadena '+self.line_to_read+' NO fue aceptada por el AFD.')
-            print('-------------------------------------------------')'''
-
 
     def simulation(self):
         """Funcion para simular una linea de entrada
@@ -330,6 +298,71 @@ class Scanner:
 
         print('')
 
+    def simulationV2(self):
+        """Simulacion del AFD de resultado
+        """
+        s = [0]
+        s2 = [0]
+        counter = 0
+        token_construction = ''
+
+        while counter < len(self.line_to_read)-1:
+            curr_char = self.line_to_read[counter]
+            next_char = self.line_to_read[counter+1]
+            s = self.move(s, curr_char)
+            s2 = self.move(s, next_char)
+            token_construction += curr_char
+
+            #si el caracter siguiente es cero, entonces ahi debemos parar de evaluar una cadena
+            if(len(s) > 0 and len(s2) == 0): # 
+                token = self.getTokenNonExplicitIdentifier(s)
+                lastId = self.getAcceptingStatesAFD()
+                if(len(token) == 0):
+                #if(S[0] not in lastId):
+                    print('Invalid token: ', token_construction)
+                    s = [0]
+                    s2 = [0]
+                    token_construction = ""
+                else:
+                    if s[0] in lastId:
+                        print('La cadena '+token_construction+' fue aceptada por el AFD.')
+                    else: 
+                        print('La cadena '+token_construction+' NO fue aceptada por el AFD.')
+
+                    print('token: '+ token_construction + ' has type: '+str(token))
+                    s = [0]
+                    s2 = [0]
+                    token_construction = ""
+                print('Invalid token: --> '+ str(curr_char)+' <--')
+            #si el caracter actual es cero entonces el token es invalido.
+            else:
+                print('La cadena '+token_construction+' NO fue aceptada por el AFD.')
+                print('Invalid token: ', token_construction)
+                S = [0]
+                S_next = [0]
+                token_construction = ""
+            
+            counter +=1
+        
+        '''lastId = self.getAcceptingStatesAFD()
+
+        if(len(s) > 0):
+            if(s[0] in lastId):
+                print('-------------------------------------------------')
+                print('La cadena '+self.line_to_read+' fue aceptada por el AFD.')
+                print('-------------------------------------------------')
+            else:
+                print('-------------------------------------------------')
+                print('La cadena '+self.line_to_read+' NO fue aceptada por el AFD.')
+                print('-------------------------------------------------')
+        else:
+            print('-------------------------------------------------')
+            print('La cadena '+self.line_to_read+' NO fue aceptada por el AFD.')
+            print('-------------------------------------------------')'''
+
+
+    
+
 # tests__________
 
 # functions ________________________
@@ -364,13 +397,13 @@ def main():
             obj = Scanner(file_name)
             obj.read_test_file()
             obj.simulationTest()
-            #obj.simulationV1()
+            #obj.simulationV2()
 
         #elif(option == '3'):
         #    file_name = str(input("Ingrese el nombre del archivo de prueba (Ej. aritmetica.txt): "))
         #    obj = Scanner(file_name)
         #    obj.read_test_file()
-        #    obj.simulationV1()
+        #    obj.simulationV2()
 
         elif(option == '4'):
             print('\nAdios! ')
